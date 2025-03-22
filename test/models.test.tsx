@@ -2,8 +2,8 @@ import { StatementList } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { ModelProperty } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/components/ZodType.jsx";
-import { ZodTypeDeclaration } from "../src/components/ZodTypeDeclaration.jsx";
+import { ZodSchema } from "../src/components/ZodSchema.jsx";
+import { ZodSchemaDeclaration } from "../src/components/ZodSchemaDeclaration.jsx";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with basic models", async () => {
@@ -16,13 +16,13 @@ it("works with basic models", async () => {
   `)) as Record<string, ModelProperty>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         stringProp: z.string(),
         optionalStringProp: z.string().optional(),
       })
-    `,
+    `
   );
 });
 
@@ -39,13 +39,13 @@ it("works with models with basic constraints", async () => {
   `)) as Record<string, ModelProperty>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         stringProp: z.string().max(10),
         numberProp: z.number().gte(10),
       })
-    `,
+    `
   );
 });
 
@@ -60,17 +60,17 @@ it("works with records", async () => {
   `)) as Record<string, ModelProperty>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.record(z.string(), z.string())
-    `,
+    `
   );
 
   expectRender(
-    <ZodType type={Test2} />,
+    <ZodSchema type={Test2} />,
     d`
       z.record(z.string(), z.string())
-    `,
+    `
   );
 });
 
@@ -84,7 +84,7 @@ it("works with records with properties", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.intersection(
         z.object({
@@ -92,7 +92,7 @@ it("works with records with properties", async () => {
         }),
         z.record(z.string(), z.number())
       )
-    `,
+    `
   );
 });
 
@@ -107,14 +107,14 @@ it("works with nested objects", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         prop: z.object({
           nested: z.literal(true),
         }),
       })
-    `,
+    `
   );
 });
 
@@ -131,15 +131,15 @@ it("works with referencing other schema declarations in members", async () => {
 
   expectRender(
     <StatementList>
-      <ZodTypeDeclaration type={mystring} />
-      <ZodTypeDeclaration type={Test} />
+      <ZodSchemaDeclaration type={mystring} />
+      <ZodSchemaDeclaration type={Test} />
     </StatementList>,
     d`
       const mystring = z.string();
       const Test = z.object({
         prop: mystring.max(2),
       });
-    `,
+    `
   );
 });
 
@@ -161,7 +161,7 @@ it("renders model and property docs", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
           prop: z.string()
@@ -169,7 +169,7 @@ it("renders model and property docs", async () => {
             .describe("This is a property. It is also interesting."),
         })
         .describe("This is an awesome model! It does things that are interesting.")
-    `,
+    `
   );
 });
 
@@ -183,16 +183,19 @@ it("works with arrays", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodType type={scalarArray.type} />, "z.array(z.string())");
-  expectRender(<ZodType type={scalarArray2.type} />, "z.array(z.array(z.string()))");
+  expectRender(<ZodSchema type={scalarArray.type} />, "z.array(z.string())");
   expectRender(
-    <ZodType type={modelArray.type} />,
+    <ZodSchema type={scalarArray2.type} />,
+    "z.array(z.array(z.string()))"
+  );
+  expectRender(
+    <ZodSchema type={modelArray.type} />,
     d`
       z.array(z.object({
         x: z.string(),
         y: z.string(),
       }))
-    `,
+    `
   );
 });
 
@@ -206,12 +209,12 @@ it("works with model properties with array constraints", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         prop: z.array(z.string()).max(2),
       })
-    `,
+    `
   );
 });
 
@@ -223,10 +226,10 @@ it("works with array declarations", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.array(z.string()).max(5)
-    `,
+    `
   );
 });
 
@@ -250,9 +253,9 @@ it("handles references", async () => {
 
   expectRender(
     <StatementList>
-      <ZodTypeDeclaration type={Item} />
-      <ZodTypeDeclaration type={Test} />
-      <ZodTypeDeclaration type={Test2} />
+      <ZodSchemaDeclaration type={Item} />
+      <ZodSchemaDeclaration type={Test} />
+      <ZodSchemaDeclaration type={Test2} />
     </StatementList>,
 
     d`
@@ -262,7 +265,7 @@ it("handles references", async () => {
         prop1: z.array(Item).describe("single array"),
         prop2: z.array(z.array(Item)).max(5).describe("nested array"),
       });
-    `,
+    `
   );
 });
 
@@ -284,7 +287,7 @@ it("supports property defaults", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         number: z.number().default(5),
@@ -298,7 +301,7 @@ it("supports property defaults", async () => {
         plainDate: z.coerce.date().default("2025-01-01"),
         duration: z.string().duration().default("P1Y2M3DT4H5M6S"),
       })
-    `,
+    `
   );
 });
 
@@ -312,11 +315,11 @@ it.skip("works with circular references", async () => {
   `);
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         prop: z.lazy(() => Test),
       })
-    `,
+    `
   );
 });

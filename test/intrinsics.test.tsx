@@ -1,6 +1,6 @@
 import { ModelProperty } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/components/ZodType.jsx";
+import { ZodSchema } from "../src/components/ZodSchema.jsx";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with intrinsics", async () => {
@@ -21,8 +21,8 @@ it("works with intrinsics", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodType type={nullProp.type} />, "z.null()");
-  expectRender(<ZodType type={neverProp.type} />, "z.never()");
-  expectRender(<ZodType type={unknownProp.type} />, "z.unknown()");
-  expectRender(<ZodType type={voidProp.type} />, "z.void()");
+  expectRender(<ZodSchema type={nullProp.type} />, "z.null()");
+  expectRender(<ZodSchema type={neverProp.type} />, "z.never()");
+  expectRender(<ZodSchema type={unknownProp.type} />, "z.unknown()");
+  expectRender(<ZodSchema type={voidProp.type} />, "z.void()");
 });

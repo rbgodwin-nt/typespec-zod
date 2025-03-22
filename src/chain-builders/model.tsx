@@ -5,15 +5,26 @@ import { Model, ModelProperty } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { TSValueExpression } from "../components/TSValueExpression.jsx";
 import { ZodExpression } from "../components/ZodExpression.jsx";
-import { ZodType } from "../components/ZodType.jsx";
-import { call, isDeclaration, isRecord, refkeySym, shouldReference } from "../utils.jsx";
-import { arrayConstraints, docBuilder, numericConstraints, stringConstraints } from "./common.jsx";
+import { ZodSchema } from "../components/ZodSchema.jsx";
+import {
+  call,
+  isDeclaration,
+  isRecord,
+  refkeySym,
+  shouldReference,
+} from "../utils.jsx";
+import {
+  arrayConstraints,
+  docBuilder,
+  numericConstraints,
+  stringConstraints,
+} from "./common.jsx";
 import { typeBuilder } from "./type.jsx";
 
 export function modelBuilder(type: Model) {
   if ($.array.is(type)) {
     return [
-      call("array", <ZodType type={type.indexer!.value} nested />),
+      call("array", <ZodSchema type={type.indexer!.value} nested />),
       ...arrayConstraints(type as Model),
       ...docBuilder(type),
     ];
@@ -25,13 +36,21 @@ export function modelBuilder(type: Model) {
 
   if (
     isRecord(type) ||
-    (!!type.baseModel && isRecord(type.baseModel) && !isDeclaration(type.baseModel))
+    (!!type.baseModel &&
+      isRecord(type.baseModel) &&
+      !isDeclaration(type.baseModel))
   ) {
     recordPart = [
       call(
         "record",
-        <ZodType type={(type.indexer ?? type.baseModel!.indexer)!.key} nested />,
-        <ZodType type={(type.indexer ?? type.baseModel!.indexer)!.value} nested />,
+        <ZodSchema
+          type={(type.indexer ?? type.baseModel!.indexer)!.key}
+          nested
+        />,
+        <ZodSchema
+          type={(type.indexer ?? type.baseModel!.indexer)!.value}
+          nested
+        />
       ),
     ];
   }
@@ -41,8 +60,12 @@ export function modelBuilder(type: Model) {
 
     for (const member of type.properties.values()) {
       const memberComponents = [
-        shouldReference(member.type) ? refkey(member.type, refkeySym) : typeBuilder(member.type),
-        ...($.scalar.extendsString(member.type) ? stringConstraints(member) : []),
+        shouldReference(member.type)
+          ? refkey(member.type, refkeySym)
+          : typeBuilder(member.type),
+        ...($.scalar.extendsString(member.type)
+          ? stringConstraints(member)
+          : []),
         ...($.scalar.extendsNumeric(member.type)
           ? numericConstraints(member, undefined, undefined)
           : []),
@@ -54,7 +77,9 @@ export function modelBuilder(type: Model) {
 
       membersSpec[member.name] = () => {
         if (shouldReference(member.type)) {
-          return <MemberChainExpression>{memberComponents}</MemberChainExpression>;
+          return (
+            <MemberChainExpression>{memberComponents}</MemberChainExpression>
+          );
         }
 
         return <ZodExpression>{memberComponents}</ZodExpression>;
@@ -68,14 +93,17 @@ export function modelBuilder(type: Model) {
       call(
         "intersection",
         <ZodExpression>{objectPart}</ZodExpression>,
-        <ZodExpression>{recordPart}</ZodExpression>,
+        <ZodExpression>{recordPart}</ZodExpression>
       ),
     ];
   } else {
     components = objectPart ?? recordPart ?? [];
   }
 
-  if (type.baseModel && (!isRecord(type.baseModel) || isDeclaration(type.baseModel))) {
+  if (
+    type.baseModel &&
+    (!isRecord(type.baseModel) || isDeclaration(type.baseModel))
+  ) {
     if (isDeclaration(type.baseModel)) {
       const nestedComponents = components;
       components = [

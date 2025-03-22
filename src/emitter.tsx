@@ -10,7 +10,7 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { writeOutput } from "@typespec/emitter-framework";
-import { ZodTypeDeclaration } from "./components/ZodTypeDeclaration.jsx";
+import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
 import {
   createCycleSets,
@@ -37,7 +37,7 @@ export async function $onEmit(context: EmitContext) {
             </>
           }
         >
-          {(type) => <ZodTypeDeclaration type={type} export />}
+          {(type) => <ZodSchemaDeclaration type={type} export />}
         </ay.For>
       </ts.SourceFile>
     </ay.Output>,

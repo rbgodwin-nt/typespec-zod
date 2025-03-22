@@ -110,3 +110,30 @@ export async function $onEmit(context: EmitContext) {
   );
 }
 ```
+
+## `<ZodSchemaDeclaration>`
+
+Declares a Zod schema in a variable binding (let, const, or var).
+
+### Props
+
+| prop        | type               | description                                               |
+| ----------- | ------------------ | --------------------------------------------------------- |
+| **type**    | Type               | the TypeSpec type to create a zod schema for.             |
+| **name**    | string (optional)  | The name of the declaration, defaults to the Type's name. |
+| **const**   | boolean (optional) | Emit a const declaration.                                 |
+| **let**     | boolean (optional) | Emit a let declaration.                                   |
+| **var**     | boolean (optional) | Emit a var declaration.                                   |
+| **export**  | boolean (optional) | Export the declaration.                                   |
+| **default** | boolean (optional) | Default export the declaration.                           |
+| **refkeys** | Refkey[]           | Refkeys for the symbol created by this declaration.       |
+
+## `<ZodSchema>`
+
+Convert the given type to a Zod schema expression.
+
+### Props
+
+| prop     | type | description                                   |
+| -------- | ---- | --------------------------------------------- |
+| **type** | Type | the TypeSpec type to create a zod schema for. |

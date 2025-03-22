@@ -1,6 +1,6 @@
 import { ModelProperty } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/components/ZodType.jsx";
+import { ZodSchema } from "../src/components/ZodSchema.jsx";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with literals", async () => {
@@ -18,7 +18,7 @@ it("works with literals", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodType type={stringProp.type} />, 'z.literal("hello")');
-  expectRender(<ZodType type={numberProp.type} />, "z.literal(123)");
-  expectRender(<ZodType type={booleanProp.type} />, "z.literal(true)");
+  expectRender(<ZodSchema type={stringProp.type} />, 'z.literal("hello")');
+  expectRender(<ZodSchema type={numberProp.type} />, "z.literal(123)");
+  expectRender(<ZodSchema type={booleanProp.type} />, "z.literal(true)");
 });

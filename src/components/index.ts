@@ -1,3 +1,3 @@
 export * from "./ZodExpression.jsx";
-export * from "./ZodType.jsx";
-export * from "./ZodTypeDeclaration.jsx";
+export * from "./ZodSchema.jsx";
+export * from "./ZodSchemaDeclaration.jsx";

@@ -1,11 +1,11 @@
 import { refkey } from "@alloy-js/core";
 import { MemberChainExpression } from "@alloy-js/typescript";
 import { Type } from "@typespec/compiler";
-import { typeBuilder } from "../chain-builders/type.js";
+import { typeBuilder } from "../chain-builders/type.jsx";
 import { zod } from "../external-packages/zod.js";
-import { refkeySym, shouldReference } from "../utils.js";
+import { refkeySym, shouldReference } from "../utils.jsx";
 
-export interface ZodTypeProps {
+export interface ZodSchemaProps {
   type: Type;
   nested?: boolean;
 }
@@ -13,7 +13,7 @@ export interface ZodTypeProps {
 /**
  * Component that translates a TypeSpec type into the Zod type
  */
-export function ZodType(props: ZodTypeProps) {
+export function ZodSchema(props: ZodSchemaProps) {
   if (props.nested && shouldReference(props.type)) {
     return refkey(props.type, refkeySym);
   }

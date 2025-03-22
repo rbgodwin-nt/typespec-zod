@@ -1,7 +1,7 @@
 import { For } from "@alloy-js/core";
 import { ArrayExpression } from "@alloy-js/typescript";
 import { Tuple } from "@typespec/compiler";
-import { ZodType } from "../components/ZodType.jsx";
+import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
 
 export function tupleBuilder(type: Tuple) {
@@ -11,10 +11,10 @@ export function tupleBuilder(type: Tuple) {
       <ArrayExpression>
         <For each={Array.from(type.values)} comma line>
           {(value) => {
-            return <ZodType type={value} nested />;
+            return <ZodSchema type={value} nested />;
           }}
         </For>
-      </ArrayExpression>,
+      </ArrayExpression>
     ),
   ];
 }

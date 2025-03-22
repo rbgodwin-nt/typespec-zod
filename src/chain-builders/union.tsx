@@ -1,12 +1,18 @@
 import { For } from "@alloy-js/core";
 import { ArrayExpression } from "@alloy-js/typescript";
-import { getDiscriminatedUnion, ignoreDiagnostics, Union } from "@typespec/compiler";
+import {
+  getDiscriminatedUnion,
+  ignoreDiagnostics,
+  Union,
+} from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
-import { ZodType } from "../components/ZodType.jsx";
+import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
 
 export function unionBuilder(type: Union) {
-  const discriminated = ignoreDiagnostics(getDiscriminatedUnion($.program, type));
+  const discriminated = ignoreDiagnostics(
+    getDiscriminatedUnion($.program, type)
+  );
 
   if ($.union.isExpression(type) || !discriminated) {
     return [
@@ -14,9 +20,9 @@ export function unionBuilder(type: Union) {
         "union",
         <ArrayExpression>
           <For each={Array.from(type.variants.values())} comma line>
-            {(variant) => <ZodType type={variant.type} nested />}
+            {(variant) => <ZodSchema type={variant.type} nested />}
           </For>
-        </ArrayExpression>,
+        </ArrayExpression>
       ),
     ];
   }
@@ -41,9 +47,9 @@ export function unionBuilder(type: Union) {
                 }),
               },
             });
-            return <ZodType type={envelope} nested />;
+            return <ZodSchema type={envelope} nested />;
           } else {
-            return <ZodType type={variant.type} nested />;
+            return <ZodSchema type={variant.type} nested />;
           }
         }}
       </For>

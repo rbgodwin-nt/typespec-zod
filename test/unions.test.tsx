@@ -1,7 +1,7 @@
 import { d } from "@alloy-js/core/testing";
 import { Model, Union } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/index.js";
+import { ZodSchema } from "../src/index.js";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with union expressions", async () => {
@@ -13,12 +13,12 @@ it("works with union expressions", async () => {
   `)) as Record<string, Model>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.object({
         prop: z.union([z.literal("hi"), z.literal("ho"), z.literal("ha")]),
       })
-    `,
+    `
   );
 });
 
@@ -33,7 +33,7 @@ it("works with discriminated unions with envelope", async () => {
   `)) as Record<string, Union>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.discriminatedUnion(
         "kind",
@@ -50,7 +50,7 @@ it("works with discriminated unions with envelope", async () => {
           })
         ]
       )
-    `,
+    `
   );
 });
 
@@ -65,7 +65,7 @@ it("works with discriminated unions without envelope", async () => {
   `)) as Record<string, Union>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.discriminatedUnion(
         "kind",
@@ -80,7 +80,7 @@ it("works with discriminated unions without envelope", async () => {
           })
         ]
       )
-    `,
+    `
   );
 });
 
@@ -94,7 +94,7 @@ it("works with non-discriminated unions", async () => {
   `)) as Record<string, Union>;
 
   expectRender(
-    <ZodType type={Test} />,
+    <ZodSchema type={Test} />,
     d`
       z.union([
         z.object({
@@ -102,7 +102,7 @@ it("works with non-discriminated unions", async () => {
         }),
         z.literal(true)
       ])
-    `,
+    `
   );
 });
 

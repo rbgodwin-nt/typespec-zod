@@ -2,7 +2,7 @@ import { StatementList } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { ModelProperty } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodTypeDeclaration } from "../src/index.js";
+import { ZodSchemaDeclaration } from "../src/index.js";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works", async () => {
@@ -17,8 +17,8 @@ it("works", async () => {
 
   expectRender(
     <StatementList>
-      <ZodTypeDeclaration type={Ref} />
-      <ZodTypeDeclaration type={Test.type} name="tuple" />
+      <ZodSchemaDeclaration type={Ref} />
+      <ZodSchemaDeclaration type={Test.type} name="tuple" />
     </StatementList>,
     d`
       const Ref = z.object({});
@@ -30,6 +30,6 @@ it("works", async () => {
         }),
         Ref
       ]);
-    `,
+    `
   );
 });

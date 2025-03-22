@@ -1,7 +1,7 @@
 import { d } from "@alloy-js/core/testing";
 import { Model } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/components/ZodType.jsx";
+import { ZodSchema } from "../src/components/ZodSchema.jsx";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with enums", async () => {
@@ -27,13 +27,13 @@ it("works with enums", async () => {
   `)) as Record<string, Model>;
 
   expectRender(
-    <ZodType type={Refs} />,
+    <ZodSchema type={Refs} />,
     d`
       z.object({
         a: z.literal("A"),
         b: z.literal(1),
         c: z.literal("one"),
       })
-    `,
+    `
   );
 });

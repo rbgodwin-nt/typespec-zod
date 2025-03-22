@@ -1,6 +1,6 @@
 import { Enum } from "@typespec/compiler";
 import { it } from "vitest";
-import { ZodType } from "../src/index.js";
+import { ZodSchema } from "../src/index.js";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("works with no values", async () => {
@@ -11,7 +11,7 @@ it("works with no values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodType type={Test} />, `z.enum(["A", "B"])`);
+  expectRender(<ZodSchema type={Test} />, `z.enum(["A", "B"])`);
 });
 
 it("works with string values", async () => {
@@ -22,7 +22,7 @@ it("works with string values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodType type={Test} />, `z.enum(["a", "b"])`);
+  expectRender(<ZodSchema type={Test} />, `z.enum(["a", "b"])`);
 });
 
 it("works with number values", async () => {
@@ -33,5 +33,5 @@ it("works with number values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodType type={Test} />, `z.enum([1, 2])`);
+  expectRender(<ZodSchema type={Test} />, `z.enum([1, 2])`);
 });

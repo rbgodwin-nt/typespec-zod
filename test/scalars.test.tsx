@@ -1,6 +1,6 @@
 import { ModelProperty } from "@typespec/compiler";
 import { describe, it } from "vitest";
-import { ZodType } from "../src/components/ZodType.jsx";
+import { ZodSchema } from "../src/components/ZodSchema.jsx";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
 describe("scalars", () => {
@@ -13,12 +13,13 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={booleanProp.type} />, "z.boolean()");
+    expectRender(<ZodSchema type={booleanProp.type} />, "z.boolean()");
   });
 
   it("works with string", async () => {
     const runner = await createTestRunner();
-    const { stringProp, shortStringProp, urlProp, uuidProp, patternProp } = (await runner.compile(`
+    const { stringProp, shortStringProp, urlProp, uuidProp, patternProp } =
+      (await runner.compile(`
       @maxLength(10)
       @minLength(5)
       scalar shortString extends string;
@@ -39,32 +40,55 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={stringProp.type} />, "z.string()");
-    expectRender(<ZodType type={shortStringProp.type} />, "z.string().min(5).max(10)");
-    expectRender(<ZodType type={urlProp.type} />, "z.string().url()");
-    expectRender(<ZodType type={uuidProp} />, "z.string().uuid()");
-    expectRender(<ZodType type={patternProp} />, "z.string().regex(/[0-9]+/)");
+    expectRender(<ZodSchema type={stringProp.type} />, "z.string()");
+    expectRender(
+      <ZodSchema type={shortStringProp.type} />,
+      "z.string().min(5).max(10)"
+    );
+    expectRender(<ZodSchema type={urlProp.type} />, "z.string().url()");
+    expectRender(<ZodSchema type={uuidProp} />, "z.string().uuid()");
+    expectRender(
+      <ZodSchema type={patternProp} />,
+      "z.string().regex(/[0-9]+/)"
+    );
   });
 
   describe("numerics", () => {
     it("handles numeric constraints", async () => {
       const runner = await createTestRunner();
-      const { int8WithMin, int8WithMinMax, int8WithMinExclusive, int8WithMinMaxExclusive } =
-        (await runner.compile(`
+      const {
+        int8WithMin,
+        int8WithMinMax,
+        int8WithMinExclusive,
+        int8WithMinMaxExclusive,
+      } = (await runner.compile(`
       @test @minValue(-20) scalar int8WithMin extends int8;
       @test @minValue(-20) @maxValue(20) scalar int8WithMinMax extends int8;
       @test @minValueExclusive(2) scalar int8WithMinExclusive extends int8; 
       @test @minValueExclusive(2) @maxValueExclusive(20) scalar int8WithMinMaxExclusive extends int8;
     `)) as Record<string, ModelProperty>;
-      expectRender(<ZodType type={int8WithMin} />, "z.number().int().gte(-20).lte(127)");
-      expectRender(<ZodType type={int8WithMinMax} />, "z.number().int().gte(-20).lte(20)");
-      expectRender(<ZodType type={int8WithMinExclusive} />, "z.number().int().gt(2).lte(127)");
-      expectRender(<ZodType type={int8WithMinMaxExclusive} />, "z.number().int().gt(2).lt(20)");
+      expectRender(
+        <ZodSchema type={int8WithMin} />,
+        "z.number().int().gte(-20).lte(127)"
+      );
+      expectRender(
+        <ZodSchema type={int8WithMinMax} />,
+        "z.number().int().gte(-20).lte(20)"
+      );
+      expectRender(
+        <ZodSchema type={int8WithMinExclusive} />,
+        "z.number().int().gt(2).lte(127)"
+      );
+      expectRender(
+        <ZodSchema type={int8WithMinMaxExclusive} />,
+        "z.number().int().gt(2).lt(20)"
+      );
     });
 
     it("works with integers", async () => {
       const runner = await createTestRunner();
-      const { int8Prop, int16Prop, int32Prop, int64Prop } = (await runner.compile(`
+      const { int8Prop, int16Prop, int32Prop, int64Prop } =
+        (await runner.compile(`
         model Test {
           @test int8Prop: int8,
           @test int16Prop: int16,
@@ -73,21 +97,28 @@ describe("scalars", () => {
         }
       `)) as Record<string, ModelProperty>;
 
-      expectRender(<ZodType type={int8Prop.type} />, "z.number().int().gte(-128).lte(127)");
-      expectRender(<ZodType type={int16Prop.type} />, "z.number().int().gte(-32768).lte(32767)");
       expectRender(
-        <ZodType type={int32Prop.type} />,
-        "z.number().int().gte(-2147483648).lte(2147483647)",
+        <ZodSchema type={int8Prop.type} />,
+        "z.number().int().gte(-128).lte(127)"
       );
       expectRender(
-        <ZodType type={int64Prop.type} />,
-        "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
+        <ZodSchema type={int16Prop.type} />,
+        "z.number().int().gte(-32768).lte(32767)"
+      );
+      expectRender(
+        <ZodSchema type={int32Prop.type} />,
+        "z.number().int().gte(-2147483648).lte(2147483647)"
+      );
+      expectRender(
+        <ZodSchema type={int64Prop.type} />,
+        "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)"
       );
     });
 
     it("works with unsigned integers", async () => {
       const runner = await createTestRunner();
-      const { uint8Prop, uint16Prop, uint32Prop, uint64Prop, safeintProp } = (await runner.compile(`
+      const { uint8Prop, uint16Prop, uint32Prop, uint64Prop, safeintProp } =
+        (await runner.compile(`
       model Test {
         @test uint8Prop: uint8,
         @test uint16Prop: uint16,
@@ -97,17 +128,26 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-      expectRender(<ZodType type={uint8Prop.type} />, "z.number().int().nonnegative().lte(255)");
-      expectRender(<ZodType type={uint16Prop.type} />, "z.number().int().nonnegative().lte(65535)");
       expectRender(
-        <ZodType type={uint32Prop.type} />,
-        "z.number().int().nonnegative().lte(4294967295)",
+        <ZodSchema type={uint8Prop.type} />,
+        "z.number().int().nonnegative().lte(255)"
       );
       expectRender(
-        <ZodType type={uint64Prop.type} />,
-        "z.number().int().nonnegative().lte(18446744073709551615)",
+        <ZodSchema type={uint16Prop.type} />,
+        "z.number().int().nonnegative().lte(65535)"
       );
-      expectRender(<ZodType type={safeintProp.type} />, "z.number().int().safe()");
+      expectRender(
+        <ZodSchema type={uint32Prop.type} />,
+        "z.number().int().nonnegative().lte(4294967295)"
+      );
+      expectRender(
+        <ZodSchema type={uint64Prop.type} />,
+        "z.number().int().nonnegative().lte(18446744073709551615)"
+      );
+      expectRender(
+        <ZodSchema type={safeintProp.type} />,
+        "z.number().int().safe()"
+      );
     });
 
     it("works with floats", async () => {
@@ -121,11 +161,11 @@ describe("scalars", () => {
       `)) as Record<string, ModelProperty>;
 
       expectRender(
-        <ZodType type={float32Prop.type} />,
-        "z.number().gte(-3.4028235e+38).lte(3.4028235e+38)",
+        <ZodSchema type={float32Prop.type} />,
+        "z.number().gte(-3.4028235e+38).lte(3.4028235e+38)"
       );
-      expectRender(<ZodType type={float64Prop.type} />, "z.number()");
-      expectRender(<ZodType type={floatProp.type} />, "z.number()");
+      expectRender(<ZodSchema type={float64Prop.type} />, "z.number()");
+      expectRender(<ZodSchema type={floatProp.type} />, "z.number()");
     });
 
     it("works with decimals", async () => {
@@ -137,8 +177,8 @@ describe("scalars", () => {
         }
       `)) as Record<string, ModelProperty>;
 
-      expectRender(<ZodType type={decimalProp.type} />, "z.number()");
-      expectRender(<ZodType type={decimal128Prop.type} />, "z.number()");
+      expectRender(<ZodSchema type={decimalProp.type} />, "z.number()");
+      expectRender(<ZodSchema type={decimal128Prop.type} />, "z.number()");
     });
   });
 
@@ -150,13 +190,18 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={bytesProp.type} />, "z.any()");
+    expectRender(<ZodSchema type={bytesProp.type} />, "z.any()");
   });
 
   it("works with date things", async () => {
     const runner = await createTestRunner();
-    const { plainDateProp, plainTimeProp, utcDateTimeProp, offsetDateTimeProp, durationProp } =
-      (await runner.compile(`
+    const {
+      plainDateProp,
+      plainTimeProp,
+      utcDateTimeProp,
+      offsetDateTimeProp,
+      durationProp,
+    } = (await runner.compile(`
       model Test {
         @test plainDateProp: plainDate,
         @test plainTimeProp: plainTime,
@@ -165,10 +210,13 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={plainDateProp.type} />, "z.coerce.date()");
-    expectRender(<ZodType type={plainTimeProp.type} />, "z.string().time()");
-    expectRender(<ZodType type={utcDateTimeProp.type} />, "z.coerce.date()");
-    expectRender(<ZodType type={offsetDateTimeProp.type} />, "z.coerce.date()");
+    expectRender(<ZodSchema type={plainDateProp.type} />, "z.coerce.date()");
+    expectRender(<ZodSchema type={plainTimeProp.type} />, "z.string().time()");
+    expectRender(<ZodSchema type={utcDateTimeProp.type} />, "z.coerce.date()");
+    expectRender(
+      <ZodSchema type={offsetDateTimeProp.type} />,
+      "z.coerce.date()"
+    );
   });
 
   it("works with dates and encodings", async () => {
@@ -206,15 +254,21 @@ describe("scalars", () => {
       scalar rfc7231DateOffset extends offsetDateTime;
     `);
 
-    expectRender(<ZodType type={int32Date} />, "z.number().int().gte(-2147483648).lte(2147483647)");
     expectRender(
-      <ZodType type={int64Date} />,
-      "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
+      <ZodSchema type={int32Date} />,
+      "z.number().int().gte(-2147483648).lte(2147483647)"
     );
-    expectRender(<ZodType type={rfc3339DateUtc} />, "z.string().datetime()");
-    expectRender(<ZodType type={rfc3339DateOffset} />, "z.string().datetime()");
-    expectRender(<ZodType type={rfc7231DateUtc} />, "z.string()");
-    expectRender(<ZodType type={rfc7231DateOffset} />, "z.string()");
+    expectRender(
+      <ZodSchema type={int64Date} />,
+      "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)"
+    );
+    expectRender(<ZodSchema type={rfc3339DateUtc} />, "z.string().datetime()");
+    expectRender(
+      <ZodSchema type={rfc3339DateOffset} />,
+      "z.string().datetime()"
+    );
+    expectRender(<ZodSchema type={rfc7231DateUtc} />, "z.string()");
+    expectRender(<ZodSchema type={rfc7231DateOffset} />, "z.string()");
   });
 
   it("works with durations and encodings", async () => {
@@ -237,15 +291,15 @@ describe("scalars", () => {
       scalar myDuration extends duration;
     `);
 
-    expectRender(<ZodType type={myDuration} />, "z.string().duration()");
-    expectRender(<ZodType type={isoDuration} />, "z.string().duration()");
+    expectRender(<ZodSchema type={myDuration} />, "z.string().duration()");
+    expectRender(<ZodSchema type={isoDuration} />, "z.string().duration()");
     expectRender(
-      <ZodType type={secondsDuration} />,
-      "z.number().int().gte(-2147483648).lte(2147483647)",
+      <ZodSchema type={secondsDuration} />,
+      "z.number().int().gte(-2147483648).lte(2147483647)"
     );
     expectRender(
-      <ZodType type={int64SecondsDuration} />,
-      "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
+      <ZodSchema type={int64SecondsDuration} />,
+      "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)"
     );
   });
 
@@ -255,7 +309,7 @@ describe("scalars", () => {
       @test scalar unknownScalar;
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={unknownScalar} />, "z.any()");
+    expectRender(<ZodSchema type={unknownScalar} />, "z.any()");
   });
 
   it("emits docs", async () => {
@@ -265,6 +319,9 @@ describe("scalars", () => {
       @test scalar unknownScalar;
     `)) as Record<string, ModelProperty>;
 
-    expectRender(<ZodType type={unknownScalar} />, 'z.any().describe("An unknown scalar")');
+    expectRender(
+      <ZodSchema type={unknownScalar} />,
+      'z.any().describe("An unknown scalar")'
+    );
   });
 });
