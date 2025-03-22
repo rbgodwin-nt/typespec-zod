@@ -111,11 +111,13 @@ export async function $onEmit(context: EmitContext) {
 }
 ```
 
-## `<ZodSchemaDeclaration>`
+## Library Documentation
+
+### `<ZodSchemaDeclaration>` component
 
 Declares a Zod schema in a variable binding (let, const, or var).
 
-### Props
+#### Props
 
 | prop        | type               | description                                               |
 | ----------- | ------------------ | --------------------------------------------------------- |
@@ -128,11 +130,11 @@ Declares a Zod schema in a variable binding (let, const, or var).
 | **default** | boolean (optional) | Default export the declaration.                           |
 | **refkeys** | Refkey[]           | Refkeys for the symbol created by this declaration.       |
 
-## `<ZodSchema>`
+### `<ZodSchema>` Component
 
 Convert the given type to a Zod schema expression.
 
-### Props
+#### Props
 
 | prop     | type | description                                   |
 | -------- | ---- | --------------------------------------------- |
