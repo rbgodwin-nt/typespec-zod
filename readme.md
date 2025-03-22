@@ -87,9 +87,8 @@ export const pet = z.discriminatedUnion("kind", [
 ```tsx
 import {
   zod, // symbol definitions for the Zod library
-  ZodTypeDeclaration, // component to create a Zod declaration
+  ZodSchemaDeclaration, // component to declare a Zod schema
 } from "typespec-zod";
-
 import { For, Output } from "@alloy-js/core";
 import { SourceFile } from "@alloy-js/typescript";
 import { writeOutput } from "@typespec/emitter-framework";
@@ -102,7 +101,7 @@ export async function $onEmit(context: EmitContext) {
     <Output externals={[zod]}>
       <SourceFile path="zod-types.ts">
         <For each={models}>
-          {(model) => <ZodTypeDeclaration export type={model} />}
+          {(model) => <ZodSchemaDeclaration export type={model} />}
         </For>
       </SourceFile>
     </Output>,
