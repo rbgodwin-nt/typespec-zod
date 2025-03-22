@@ -1,6 +1,6 @@
 {
   "name": "typespec-zod",
-  "version": "1.0.0-preview.1",
+  "version": "1.0.0-preview.2",
   "type": "module",
   "exports": {
     ".": {
@@ -19,10 +19,16 @@
     "test": "vitest run",
     "format": "prettier . --write"
   },
-  "keywords": [],
-  "author": "",
+  "author": "Brian Terlson",
+  "repository": "github:bterlson/typespec-zod",
+  "keywords": [
+    "typespec",
+    "emitter",
+    "zod",
+    "schema"
+  ],
   "license": "ISC",
-  "description": "",
+  "description": "A TypeSpec emitter and library for creating Zod schemas from TypeSpec types.",
   "peerDependencies": {
     "@alloy-js/core": "^0.7.0",
     "@alloy-js/typescript": "^0.7.0",
