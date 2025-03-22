@@ -1,0 +1,32 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`handles the readme sample 1`] = `
+"import { z } from "zod";
+
+export const petBase = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(10),
+});
+
+export const dog = z.petBase.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export const cat = z.petBase.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615),
+}));
+
+export const pet = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: dog,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: cat,
+    })
+  ]
+);"
+`;
