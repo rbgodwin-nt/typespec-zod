@@ -8,6 +8,7 @@ import {
 import { expect } from "vitest";
 import { zod } from "../src/index.js";
 import { TypeSpecZodTestLibrary } from "../src/testing/index.js";
+import { HttpTestLibrary } from "@typespec/http/testing";
 
 export function expectRender(children: Children, expected: string) {
   const template = (
@@ -22,23 +23,33 @@ export function expectRender(children: Children, expected: string) {
   ).toBe(expected);
 }
 
-export async function createTestHost() {
+export async function createTestHost(includeHttp = false) {
   return coreCreateTestHost({
-    libraries: [TypeSpecZodTestLibrary],
+    libraries: [
+      TypeSpecZodTestLibrary,
+      ...(includeHttp ? [HttpTestLibrary] : []),
+    ],
   });
 }
 
 export async function createTestRunner() {
   const host = await createTestHost();
-  const importAndUsings = ``;
+  const importAndUsings = "";
   return createTestWrapper(host, {
     wrapper: (code) => `${importAndUsings} ${code}`,
   });
 }
 
-export async function createEmitterTestRunner(emitterOptions?: {}) {
-  const host = await createTestHost();
-  const importAndUsings = ``;
+export async function createEmitterTestRunner(
+  emitterOptions?: {},
+  includeHttp = false
+) {
+  const host = await createTestHost(includeHttp);
+
+  const importAndUsings = includeHttp
+    ? `import "@typespec/http"; using Http;\n`
+    : ``;
+
   return createTestWrapper(host, {
     wrapper: (code) => `${importAndUsings} ${code}`,
     compilerOptions: {

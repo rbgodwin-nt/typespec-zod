@@ -110,6 +110,22 @@ export async function $onEmit(context: EmitContext) {
 }
 ```
 
+## Emitter Documentation
+
+The emitter will emit Zod schemas for all user-defined types and types which are
+reachable from user-defined types with the exception of types in the TypeSpec
+namespace. So in particular:
+
+- User-defined types which reference built-in scalars or models will emit the
+  Zod schema for the referenced scalar inline rather than create a declaration
+- User-defined types which reference models from the standard library will emit
+  the Zod schema for the referenced model inline rather than create a
+  declaration
+- User-defined types which reference types in third party libraries will emit a
+  declaration for the referenced type and reference that declaration.
+- Non-user-defined types that are not referenced by user-defined types will not
+  be emitted.
+
 ## Library Documentation
 
 ### `<ZodSchemaDeclaration>` component
@@ -120,7 +136,7 @@ Declares a Zod schema in a variable binding (let, const, or var).
 
 | prop        | type               | description                                               |
 | ----------- | ------------------ | --------------------------------------------------------- |
-| **type**    | Type               | the TypeSpec type to create a zod schema for.             |
+| **type**    | Type               | The TypeSpec type to create a zod schema for.             |
 | **name**    | string (optional)  | The name of the declaration, defaults to the Type's name. |
 | **const**   | boolean (optional) | Emit a const declaration.                                 |
 | **let**     | boolean (optional) | Emit a let declaration.                                   |

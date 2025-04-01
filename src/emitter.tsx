@@ -3,6 +3,7 @@ import * as ts from "@alloy-js/typescript";
 import {
   EmitContext,
   Enum,
+  ListenerFlow,
   navigateProgram,
   navigateType,
   Program,
@@ -56,9 +57,17 @@ function getAllDataTypes(program: Program) {
       types.push(type);
     }
   }
+
+  const globalNs = $.program.getGlobalNamespaceType();
+
   navigateProgram(
     program,
     {
+      namespace(n) {
+        if (n !== globalNs && !$.type.isUserDefined(n)) {
+          return ListenerFlow.NoRecursion;
+        }
+      },
       model: collectType,
       enum: collectType,
       union: collectType,
@@ -68,31 +77,4 @@ function getAllDataTypes(program: Program) {
   );
 
   return types;
-}
-
-/**
- * Collects all the enums defined in the spec
- * @returns A collection of all defined enums in the spec
- */
-function getEnums() {
-  const enums = new Set<Enum>();
-  const globalNs = $.program.getGlobalNamespaceType();
-  const globalEnums = Array.from(globalNs.enums.values());
-  const specNamespaces = Array.from(globalNs.namespaces.values()).filter(
-    (ns) => !ns.name.startsWith("TypeSpec")
-  );
-
-  for (const ns of specNamespaces) {
-    navigateType(
-      ns,
-      {
-        enum(enumType) {
-          enums.add(enumType);
-        },
-      },
-      { includeTemplateDeclaration: false }
-    );
-  }
-
-  return [...globalEnums, ...enums];
 }

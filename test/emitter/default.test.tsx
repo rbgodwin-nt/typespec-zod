@@ -76,3 +76,23 @@ it("handles the readme sample", async () => {
 
   expect(text).toMatchSnapshot();
 });
+
+it("doesn't emit things from built-in libraries", async () => {
+  const runner = await createEmitterTestRunner({}, true);
+  await runner.compile(`
+    model PetBase {
+      age: uint8;
+    
+      @maxLength(20)
+      name: string;
+    }
+
+    model RefHttp {
+      foo: OkResponse;
+    }
+  `);
+
+  const { text } = await runner.program.host.readFile("typespec-zod/models.ts");
+
+  expect(text).toMatchSnapshot();
+});

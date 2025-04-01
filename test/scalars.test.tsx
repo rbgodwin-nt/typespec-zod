@@ -142,7 +142,7 @@ describe("scalars", () => {
       );
       expectRender(
         <ZodSchema type={uint64Prop.type} />,
-        "z.number().int().nonnegative().lte(18446744073709551615)"
+        "z.bigint().nonnegative().lte(18446744073709551615)"
       );
       expectRender(
         <ZodSchema type={safeintProp.type} />,
