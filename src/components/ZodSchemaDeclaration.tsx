@@ -20,9 +20,9 @@ export function ZodSchemaDeclaration(props: ZodSchemaDeclarationProps) {
     "nested",
   ]) as [ZodSchemaDeclarationProps, ts.VarDeclarationProps];
 
-  const refkeys = props.refkeys ?? [];
+  const refkeys = [props.refkey ?? []].flat();
   refkeys.push(internalRk);
-  varDeclProps.refkeys = refkeys;
+  varDeclProps.refkey = refkeys;
   varDeclProps.name =
     props.name ||
     ("name" in props.type &&
