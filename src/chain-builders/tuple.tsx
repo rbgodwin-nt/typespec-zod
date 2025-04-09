@@ -3,9 +3,11 @@ import { ArrayExpression } from "@alloy-js/typescript";
 import { Tuple } from "@typespec/compiler";
 import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
+import { zod } from "../external-packages/zod.js";
 
 export function tupleBuilder(type: Tuple) {
   return [
+    zod.z,
     call(
       "tuple",
       <ArrayExpression>

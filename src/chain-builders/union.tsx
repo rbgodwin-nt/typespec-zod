@@ -8,6 +8,7 @@ import {
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
+import { zod } from "../external-packages/zod.js";
 
 export function unionBuilder(type: Union) {
   const discriminated = ignoreDiagnostics(
@@ -16,6 +17,7 @@ export function unionBuilder(type: Union) {
 
   if ($.union.isExpression(type) || !discriminated) {
     return [
+      zod.z,
       call(
         "union",
         <ArrayExpression>
@@ -56,5 +58,5 @@ export function unionBuilder(type: Union) {
     </ArrayExpression>,
   ];
 
-  return [call("discriminatedUnion", ...unionArgs)];
+  return [zod.z, call("discriminatedUnion", ...unionArgs)];
 }

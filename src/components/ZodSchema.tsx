@@ -2,7 +2,6 @@ import { refkey } from "@alloy-js/core";
 import { MemberChainExpression } from "@alloy-js/typescript";
 import { Type } from "@typespec/compiler";
 import { typeBuilder } from "../chain-builders/type.jsx";
-import { zod } from "../external-packages/zod.js";
 import { refkeySym, shouldReference } from "../utils.jsx";
 
 export interface ZodSchemaProps {
@@ -19,9 +18,6 @@ export function ZodSchema(props: ZodSchemaProps) {
   }
 
   return (
-    <MemberChainExpression>
-      <>{zod.z}</>
-      {typeBuilder(props.type)}
-    </MemberChainExpression>
+    <MemberChainExpression>{typeBuilder(props.type)}</MemberChainExpression>
   );
 }

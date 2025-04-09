@@ -20,10 +20,12 @@ import {
   stringConstraints,
 } from "./common.jsx";
 import { typeBuilder } from "./type.jsx";
+import { zod } from "../external-packages/zod.js";
 
 export function modelBuilder(type: Model) {
   if ($.array.is(type)) {
     return [
+      zod.z,
       call("array", <ZodSchema type={type.indexer!.value} nested />),
       ...arrayConstraints(type as Model),
       ...docBuilder(type),
@@ -82,7 +84,9 @@ export function modelBuilder(type: Model) {
           );
         }
 
-        return <ZodExpression>{memberComponents}</ZodExpression>;
+        return (
+          <MemberChainExpression>{memberComponents}</MemberChainExpression>
+        );
       };
     }
     objectPart = [call("object", [<ObjectExpression jsValue={membersSpec} />])];
@@ -90,6 +94,7 @@ export function modelBuilder(type: Model) {
 
   if (recordPart && objectPart) {
     components = [
+      zod.z,
       call(
         "intersection",
         <ZodExpression>{objectPart}</ZodExpression>,
@@ -97,7 +102,7 @@ export function modelBuilder(type: Model) {
       ),
     ];
   } else {
-    components = objectPart ?? recordPart ?? [];
+    components = [zod.z, ...(objectPart ?? recordPart ?? [])];
   }
 
   if (
@@ -108,7 +113,10 @@ export function modelBuilder(type: Model) {
       const nestedComponents = components;
       components = [
         refkey(type.baseModel, refkeySym),
-        call("merge", <ZodExpression>{nestedComponents}</ZodExpression>),
+        call(
+          "merge",
+          <MemberChainExpression>{nestedComponents}</MemberChainExpression>
+        ),
       ];
     } else {
       components.push(...modelBuilder(type.baseModel));

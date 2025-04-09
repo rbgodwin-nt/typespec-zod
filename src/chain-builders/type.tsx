@@ -9,6 +9,7 @@ import { modelBuilder } from "./model.jsx";
 import { scalarBuilder } from "./scalar.jsx";
 import { tupleBuilder } from "./tuple.jsx";
 import { unionBuilder } from "./union.jsx";
+import { zod } from "../external-packages/zod.js";
 
 export function typeBuilder(type: Type): Children[] {
   const components: Children[] = [];
@@ -40,14 +41,14 @@ export function typeBuilder(type: Type): Children[] {
       components.push(
         ...(type.value
           ? [literalBuilder($.literal.create(type.value))]
-          : [literalBuilder($.literal.create(type.name))]),
+          : [literalBuilder($.literal.create(type.name))])
       );
       break;
     case "Tuple":
       components.push(...tupleBuilder(type));
       break;
     default:
-      components.push(call("any"));
+      components.push(zod.z, call("any"));
   }
 
   return components;

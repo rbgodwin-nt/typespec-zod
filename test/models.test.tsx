@@ -1,4 +1,4 @@
-import { StatementList } from "@alloy-js/core";
+import { List, StatementList } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { ModelProperty } from "@typespec/compiler";
 import { it } from "vitest";
@@ -301,6 +301,36 @@ it("supports property defaults", async () => {
         plainDate: z.coerce.date().default("2025-01-01"),
         duration: z.string().duration().default("P1Y2M3DT4H5M6S"),
       })
+    `
+  );
+});
+
+it("supports model extends", async () => {
+  const runner = await createTestRunner();
+  const { Point2D, Point3D } = await runner.compile(`
+    @test model Point2D {
+      x: float64,
+      y: float64
+    }
+
+    @test model Point3D extends Point2D {
+      z: float64
+    }
+  `);
+
+  expectRender(
+    <List>
+      <ZodSchemaDeclaration type={Point2D} />
+      <ZodSchemaDeclaration type={Point3D} />
+    </List>,
+    d`
+      const Point2D = z.object({
+        x: z.number(),
+        y: z.number(),
+      })
+      const Point3D = Point2D.merge(z.object({
+        z: z.number(),
+      }))
     `
   );
 });

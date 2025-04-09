@@ -7,52 +7,53 @@ import {
   numericConstraints,
   stringConstraints,
 } from "./common.jsx";
+import { zod } from "../external-packages/zod.js";
 
 export function scalarBuilder(type: Scalar): Children[] {
   let components: Children[] = [];
   if ($.scalar.extendsBoolean(type)) {
-    components = [call("boolean")];
+    components = [zod.z, call("boolean")];
   } else if ($.scalar.extendsString(type)) {
     components = stringBuilder(type);
   } else if ($.scalar.extendsNumeric(type)) {
     components = numericBuilder(type);
   } else if ($.scalar.extendsBytes(type)) {
-    components = [call("any")];
+    components = [zod.z, call("any")];
   } else if ($.scalar.extendsPlainDate(type)) {
-    components = ["coerce", call("date")];
+    components = [zod.z, "coerce", call("date")];
   } else if ($.scalar.extendsPlainTime(type)) {
-    components = [call("string"), call("time")];
+    components = [zod.z, call("string"), call("time")];
   } else if ($.scalar.extendsUtcDateTime(type)) {
     const encoding = $.scalar.getEncoding(type);
     if (encoding === undefined) {
-      components = ["coerce", call("date")];
+      components = [zod.z, "coerce", call("date")];
     } else if (encoding.encoding === "unixTimestamp") {
       components = numericBuilder(encoding.type);
     } else if (encoding.encoding === "rfc3339") {
-      components = [call("string"), call("datetime")];
+      components = [zod.z, call("string"), call("datetime")];
     } else {
       components = scalarBuilder(encoding.type);
     }
   } else if ($.scalar.extendsOffsetDateTime(type)) {
     const encoding = $.scalar.getEncoding(type);
     if (encoding === undefined) {
-      components = ["coerce", call("date")];
+      components = [zod.z, "coerce", call("date")];
     } else if (encoding.encoding === "rfc3339") {
-      components = [call("string"), call("datetime")];
+      components = [zod.z, call("string"), call("datetime")];
     } else {
       components = scalarBuilder(encoding.type);
     }
   } else if ($.scalar.extendsDuration(type)) {
     const encoding = $.scalar.getEncoding(type);
     if (encoding === undefined || encoding.encoding === "ISO8601") {
-      components = [call("string"), call("duration")];
+      components = [zod.z, call("string"), call("duration")];
     } else {
       components = scalarBuilder(encoding.type);
     }
   }
 
   if (components.length === 0) {
-    components.push(call("any"));
+    components.push(zod.z, call("any"));
   }
 
   if (!isBuiltIn(type)) {
@@ -63,7 +64,7 @@ export function scalarBuilder(type: Scalar): Children[] {
 }
 
 export function stringBuilder(type: Scalar): Children[] {
-  const baseComponents = [call("string")];
+  const baseComponents = [zod.z, call("string")];
 
   if ($.scalar.extendsUrl(type)) {
     baseComponents.push(call("url"));
@@ -72,33 +73,39 @@ export function stringBuilder(type: Scalar): Children[] {
   baseComponents.push(...stringConstraints(type));
   return baseComponents;
 }
+
 export function numericBuilder(type: Scalar | ModelProperty): Children[] {
   if ($.scalar.extendsInt8(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       ...numericConstraints(type, -(1 << 7), (1 << 7) - 1),
     ];
   } else if ($.scalar.extendsInt16(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       ...numericConstraints(type, -(1 << 15), (1 << 15) - 1),
     ];
   } else if ($.scalar.extendsInt16(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       ...numericConstraints(type, -(1 << 15), (1 << 15) - 1),
     ];
   } else if ($.scalar.extendsInt32(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       ...numericConstraints(type, -(1n << 31n), (1n << 31n) - 1n),
     ];
   } else if ($.scalar.extendsSafeint(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       call("safe"),
@@ -106,6 +113,7 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
     ];
   } else if ($.scalar.extendsInt64(type)) {
     return [
+      zod.z,
       call("bigint"),
       ...numericConstraints(
         type,
@@ -115,6 +123,7 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
     ];
   } else if ($.scalar.extendsUint8(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       call("nonnegative"),
@@ -122,6 +131,7 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
     ];
   } else if ($.scalar.extendsUint16(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       call("nonnegative"),
@@ -129,6 +139,7 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
     ];
   } else if ($.scalar.extendsUint32(type)) {
     return [
+      zod.z,
       call("number"),
       call("int"),
       call("nonnegative"),
@@ -136,14 +147,20 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
     ];
   } else if ($.scalar.extendsUint64(type)) {
     return [
+      zod.z,
       call("bigint"),
       call("nonnegative"),
       ...numericConstraints(type, undefined, (1n << 64n) - 1n),
     ];
   } else if ($.scalar.extendsInteger(type)) {
-    return [call("bigint"), ...numericConstraints(type, undefined, undefined)];
+    return [
+      zod.z,
+      call("bigint"),
+      ...numericConstraints(type, undefined, undefined),
+    ];
   } else if ($.scalar.extendsFloat32(type)) {
     return [
+      zod.z,
       call("number"),
       ...numericConstraints(type, -3.4028235e38, 3.4028235e38),
     ];
@@ -155,8 +172,16 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
   ) {
     // don't bother with min/max for these types. decimal and decimal128 are
     // especially problematic since JS has no decimal type.
-    return [call("number"), ...numericConstraints(type, undefined, undefined)];
+    return [
+      zod.z,
+      call("number"),
+      ...numericConstraints(type, undefined, undefined),
+    ];
   }
 
-  return [call("number"), ...numericConstraints(type, undefined, undefined)];
+  return [
+    zod.z,
+    call("number"),
+    ...numericConstraints(type, undefined, undefined),
+  ];
 }
