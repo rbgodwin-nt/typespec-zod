@@ -47,7 +47,7 @@
     "vitest": "^3.0.9"
   },
   "files": [
-    "dist",
+    "dist/src",
     "readme.md",
     "LICENSE",
     "package.json"
