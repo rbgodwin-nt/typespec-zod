@@ -21,8 +21,16 @@ it("works with intrinsics", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodSchema type={nullProp.type} />, "z.null()");
-  expectRender(<ZodSchema type={neverProp.type} />, "z.never()");
-  expectRender(<ZodSchema type={unknownProp.type} />, "z.unknown()");
-  expectRender(<ZodSchema type={voidProp.type} />, "z.void()");
+  expectRender(runner.program, <ZodSchema type={nullProp.type} />, "z.null()");
+  expectRender(
+    runner.program,
+    <ZodSchema type={neverProp.type} />,
+    "z.never()",
+  );
+  expectRender(
+    runner.program,
+    <ZodSchema type={unknownProp.type} />,
+    "z.unknown()",
+  );
+  expectRender(runner.program, <ZodSchema type={voidProp.type} />, "z.void()");
 });

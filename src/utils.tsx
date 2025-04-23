@@ -1,6 +1,6 @@
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { FunctionCallExpression } from "@alloy-js/typescript";
-import { Type } from "@typespec/compiler";
+import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 
 export const refkeySym = Symbol.for("typespec-zod.refkey");
@@ -9,7 +9,7 @@ export const refkeySym = Symbol.for("typespec-zod.refkey");
  * Returns true if the given type is a declaration or an instantiation of a
  * declaration.
  */
-export function isDeclaration(type: Type): boolean {
+export function isDeclaration(program: Program, type: Type): boolean {
   switch (type.kind) {
     case "Namespace":
     case "Interface":
@@ -22,7 +22,10 @@ export function isDeclaration(type: Type): boolean {
       return false;
 
     case "Model":
-      if (($.array.is(type) || $.record.is(type)) && isBuiltIn(type)) {
+      if (
+        ($(program).array.is(type) || $(program).record.is(type)) &&
+        isBuiltIn(program, type)
+      ) {
         return false;
       }
 
@@ -40,24 +43,24 @@ export function isDeclaration(type: Type): boolean {
 
 // typekit doesn't consider things which have properties as records
 // even though they are?
-export function isRecord(type: Type): boolean {
+export function isRecord(program: Program, type: Type): boolean {
   return (
     type.kind === "Model" &&
     !!type.indexer &&
-    type.indexer.key === $.builtin.string
+    type.indexer.key === $(program).builtin.string
   );
 }
 
-export function shouldReference(type: Type) {
-  return isDeclaration(type) && !isBuiltIn(type);
+export function shouldReference(program: Program, type: Type) {
+  return isDeclaration(program, type) && !isBuiltIn(program, type);
 }
 
-export function isBuiltIn(type: Type) {
+export function isBuiltIn(program: Program, type: Type) {
   if (!("namespace" in type) || type.namespace === undefined) {
     return false;
   }
 
-  const globalNs = $.program.getGlobalNamespaceType();
+  const globalNs = program.getGlobalNamespaceType();
   let tln = type.namespace;
   if (tln === globalNs) {
     return false;

@@ -5,12 +5,14 @@ import {
   ignoreDiagnostics,
   Union,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
 import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
 import { zod } from "../external-packages/zod.js";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function unionBuilder(type: Union) {
+  const { $ } = useTsp();
+
   const discriminated = ignoreDiagnostics(
     getDiscriminatedUnion($.program, type),
   );

@@ -10,7 +10,7 @@ import {
   Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
-import { writeOutput } from "@typespec/emitter-framework";
+import { writeOutput, Output } from "@typespec/emitter-framework";
 import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
 import {
@@ -25,7 +25,12 @@ export async function $onEmit(context: EmitContext) {
   const tsNamePolicy = ts.createTSNamePolicy();
 
   writeOutput(
-    <ay.Output namePolicy={tsNamePolicy} externals={[zod]}>
+    context.program,
+    <Output
+      program={context.program}
+      namePolicy={tsNamePolicy}
+      externals={[zod]}
+    >
       <ts.SourceFile path="models.ts">
         <ay.For
           each={types}
@@ -41,7 +46,7 @@ export async function $onEmit(context: EmitContext) {
           {(type) => <ZodSchemaDeclaration type={type} export />}
         </ay.For>
       </ts.SourceFile>
-    </ay.Output>,
+    </Output>,
     context.emitterOutputDir,
   );
 }
@@ -53,18 +58,18 @@ export async function $onEmit(context: EmitContext) {
 function getAllDataTypes(program: Program) {
   const types: Type[] = [];
   function collectType(type: Type) {
-    if (shouldReference(type)) {
+    if (shouldReference(program, type)) {
       types.push(type);
     }
   }
 
-  const globalNs = $.program.getGlobalNamespaceType();
+  const globalNs = program.getGlobalNamespaceType();
 
   navigateProgram(
     program,
     {
       namespace(n) {
-        if (n !== globalNs && !$.type.isUserDefined(n)) {
+        if (n !== globalNs && !$(program).type.isUserDefined(n)) {
           return ListenerFlow.NoRecursion;
         }
       },

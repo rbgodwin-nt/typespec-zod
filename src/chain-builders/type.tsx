@@ -1,6 +1,5 @@
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { Type } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
 import { call } from "../utils.jsx";
 import { enumBuilder } from "./enum.jsx";
 import { intrinsicBuilder } from "./intrinsic.jsx";
@@ -10,8 +9,11 @@ import { scalarBuilder } from "./scalar.jsx";
 import { tupleBuilder } from "./tuple.jsx";
 import { unionBuilder } from "./union.jsx";
 import { zod } from "../external-packages/zod.js";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function typeBuilder(type: Type): Children[] {
+  const { $ } = useTsp();
+
   const components: Children[] = [];
   switch (type.kind) {
     case "Intrinsic":

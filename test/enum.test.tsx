@@ -11,7 +11,7 @@ it("works with no values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodSchema type={Test} />, `z.enum(["A", "B"])`);
+  expectRender(runner.program, <ZodSchema type={Test} />, `z.enum(["A", "B"])`);
 });
 
 it("works with string values", async () => {
@@ -22,7 +22,7 @@ it("works with string values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodSchema type={Test} />, `z.enum(["a", "b"])`);
+  expectRender(runner.program, <ZodSchema type={Test} />, `z.enum(["a", "b"])`);
 });
 
 it("works with number values", async () => {
@@ -33,5 +33,5 @@ it("works with number values", async () => {
     }
   `)) as Record<string, Enum>;
 
-  expectRender(<ZodSchema type={Test} />, `z.enum([1, 2])`);
+  expectRender(runner.program, <ZodSchema type={Test} />, `z.enum([1, 2])`);
 });

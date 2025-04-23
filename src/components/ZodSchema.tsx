@@ -3,6 +3,7 @@ import { MemberChainExpression } from "@alloy-js/typescript";
 import { Type } from "@typespec/compiler";
 import { typeBuilder } from "../chain-builders/type.jsx";
 import { refkeySym, shouldReference } from "../utils.jsx";
+import { useTsp } from "@typespec/emitter-framework";
 
 export interface ZodSchemaProps {
   readonly type: Type;
@@ -13,7 +14,8 @@ export interface ZodSchemaProps {
  * Component that translates a TypeSpec type into the Zod type
  */
 export function ZodSchema(props: ZodSchemaProps) {
-  if (props.nested && shouldReference(props.type)) {
+  const { program } = useTsp();
+  if (props.nested && shouldReference(program, props.type)) {
     return refkey(props.type, refkeySym);
   }
 
