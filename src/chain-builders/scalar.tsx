@@ -8,8 +8,10 @@ import {
   stringConstraints,
 } from "./common.jsx";
 import { zod } from "../external-packages/zod.js";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function scalarBuilder(type: Scalar): Children[] {
+  const { $ } = useTsp();
   let components: Children[] = [];
   if ($.scalar.extendsBoolean(type)) {
     components = [zod.z, call("boolean")];
@@ -56,7 +58,7 @@ export function scalarBuilder(type: Scalar): Children[] {
     components.push(zod.z, call("any"));
   }
 
-  if (!isBuiltIn(type)) {
+  if (!isBuiltIn($.program, type)) {
     components.push(...docBuilder(type));
   }
 
@@ -64,6 +66,8 @@ export function scalarBuilder(type: Scalar): Children[] {
 }
 
 export function stringBuilder(type: Scalar): Children[] {
+  const { $ } = useTsp();
+
   const baseComponents = [zod.z, call("string")];
 
   if ($.scalar.extendsUrl(type)) {
@@ -75,6 +79,8 @@ export function stringBuilder(type: Scalar): Children[] {
 }
 
 export function numericBuilder(type: Scalar | ModelProperty): Children[] {
+  const { $ } = useTsp();
+
   if ($.scalar.extendsInt8(type)) {
     return [
       zod.z,
@@ -118,7 +124,7 @@ export function numericBuilder(type: Scalar | ModelProperty): Children[] {
       ...numericConstraints(
         type,
         String(-(1n << 63n)) + "n",
-        String((1n << 63n) - 1n) + "n",
+        String((1n << 63n) - 1n) + "n"
       ),
     ];
   } else if ($.scalar.extendsUint8(type)) {

@@ -9,8 +9,10 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { call } from "../utils.jsx";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function stringConstraints(type: Scalar | ModelProperty) {
+  const { $ } = useTsp();
   const components = [];
   const minLength = $.type.minLength(type);
   const maxLength = $.type.maxLength(type);
@@ -39,8 +41,10 @@ export function stringConstraints(type: Scalar | ModelProperty) {
 export function numericConstraints(
   type: Scalar | ModelProperty,
   intrinsicMin: number | bigint | string | undefined,
-  intrinsicMax: number | bigint | string | undefined,
+  intrinsicMax: number | bigint | string | undefined
 ) {
+  const { $ } = useTsp();
+
   const components: Children[] = [];
   const decoratorConstraints = {
     min: $.type.minValue(type),
@@ -84,6 +88,8 @@ export function numericConstraints(
 }
 
 export function arrayConstraints(type: Model | ModelProperty) {
+  const { $ } = useTsp();
+
   const components: Children[] = [];
   const minItems = $.type.minItems(type);
   const maxItems = $.type.maxItems(type);
@@ -100,6 +106,8 @@ export function arrayConstraints(type: Model | ModelProperty) {
 }
 
 export function docBuilder(type: Type): Children[] {
+  const { $ } = useTsp();
+
   const doc = $.type.getDoc(type);
   if (doc) {
     return [call("describe", `"${doc.replace(/\n+/g, " ")}"`)];

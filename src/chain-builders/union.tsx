@@ -5,14 +5,16 @@ import {
   ignoreDiagnostics,
   Union,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
 import { ZodSchema } from "../components/ZodSchema.jsx";
 import { call } from "../utils.jsx";
 import { zod } from "../external-packages/zod.js";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function unionBuilder(type: Union) {
+  const { $ } = useTsp();
+
   const discriminated = ignoreDiagnostics(
-    getDiscriminatedUnion($.program, type),
+    getDiscriminatedUnion($.program, type)
   );
 
   if ($.union.isExpression(type) || !discriminated) {
@@ -24,7 +26,7 @@ export function unionBuilder(type: Union) {
           <For each={Array.from(type.variants.values())} comma line>
             {(variant) => <ZodSchema type={variant.type} nested />}
           </For>
-        </ArrayExpression>,
+        </ArrayExpression>
       ),
     ];
   }

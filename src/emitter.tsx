@@ -54,18 +54,18 @@ export async function $onEmit(context: EmitContext) {
 function getAllDataTypes(program: Program) {
   const types: Type[] = [];
   function collectType(type: Type) {
-    if (shouldReference(type)) {
+    if (shouldReference(program, type)) {
       types.push(type);
     }
   }
 
-  const globalNs = $.program.getGlobalNamespaceType();
+  const globalNs = program.getGlobalNamespaceType();
 
   navigateProgram(
     program,
     {
       namespace(n) {
-        if (n !== globalNs && !$.type.isUserDefined(n)) {
+        if (n !== globalNs && !$(program).type.isUserDefined(n)) {
           return ListenerFlow.NoRecursion;
         }
       },

@@ -21,8 +21,11 @@ import {
 } from "./common.jsx";
 import { typeBuilder } from "./type.jsx";
 import { zod } from "../external-packages/zod.js";
+import { useTsp } from "@typespec/emitter-framework";
 
 export function modelBuilder(type: Model) {
+  const { $ } = useTsp();
+
   if ($.array.is(type)) {
     return [
       zod.z,
@@ -37,10 +40,10 @@ export function modelBuilder(type: Model) {
   let objectPart: Children[] | null = null;
 
   if (
-    isRecord(type) ||
+    isRecord($.program, type) ||
     (!!type.baseModel &&
-      isRecord(type.baseModel) &&
-      !isDeclaration(type.baseModel))
+      isRecord($.program, type.baseModel) &&
+      !isDeclaration($.program, type.baseModel))
   ) {
     recordPart = [
       call(
@@ -52,7 +55,7 @@ export function modelBuilder(type: Model) {
         <ZodSchema
           type={(type.indexer ?? type.baseModel!.indexer)!.value}
           nested
-        />,
+        />
       ),
     ];
   }
@@ -62,7 +65,7 @@ export function modelBuilder(type: Model) {
 
     for (const member of type.properties.values()) {
       const memberComponents = [
-        shouldReference(member.type)
+        shouldReference($.program, member.type)
           ? refkey(member.type, refkeySym)
           : typeBuilder(member.type),
         ...($.scalar.extendsString(member.type)
@@ -78,7 +81,7 @@ export function modelBuilder(type: Model) {
       ];
 
       membersSpec[member.name] = () => {
-        if (shouldReference(member.type)) {
+        if (shouldReference($.program, member.type)) {
           return (
             <MemberChainExpression>{memberComponents}</MemberChainExpression>
           );
@@ -98,7 +101,7 @@ export function modelBuilder(type: Model) {
       call(
         "intersection",
         <ZodExpression>{objectPart}</ZodExpression>,
-        <ZodExpression>{recordPart}</ZodExpression>,
+        <ZodExpression>{recordPart}</ZodExpression>
       ),
     ];
   } else {
@@ -107,15 +110,15 @@ export function modelBuilder(type: Model) {
 
   if (
     type.baseModel &&
-    (!isRecord(type.baseModel) || isDeclaration(type.baseModel))
+    (!isRecord($.program, type.baseModel) || isDeclaration($.program, type.baseModel))
   ) {
-    if (isDeclaration(type.baseModel)) {
+    if (isDeclaration($.program, type.baseModel)) {
       const nestedComponents = components;
       components = [
         refkey(type.baseModel, refkeySym),
         call(
           "merge",
-          <MemberChainExpression>{nestedComponents}</MemberChainExpression>,
+          <MemberChainExpression>{nestedComponents}</MemberChainExpression>
         ),
       ];
     } else {
