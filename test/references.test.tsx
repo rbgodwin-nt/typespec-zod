@@ -26,7 +26,7 @@ it("works with enums", async () => {
     }
   `)) as Record<string, Model>;
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Refs} />,
     d`
       z.object({

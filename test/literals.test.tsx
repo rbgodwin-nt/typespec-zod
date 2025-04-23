@@ -18,7 +18,7 @@ it("works with literals", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodSchema type={stringProp.type} />, 'z.literal("hello")');
-  expectRender(<ZodSchema type={numberProp.type} />, "z.literal(123)");
-  expectRender(<ZodSchema type={booleanProp.type} />, "z.literal(true)");
+  expectRender(runner.program,<ZodSchema type={stringProp.type} />, 'z.literal("hello")');
+  expectRender(runner.program,<ZodSchema type={numberProp.type} />, "z.literal(123)");
+  expectRender(runner.program,<ZodSchema type={booleanProp.type} />, "z.literal(true)");
 });

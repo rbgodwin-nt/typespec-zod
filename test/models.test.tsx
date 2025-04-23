@@ -15,7 +15,7 @@ it("works with basic models", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -38,7 +38,7 @@ it("works with models with basic constraints", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -59,14 +59,14 @@ it("works with records", async () => {
     @test model Test2 extends Record<string> {}
   `)) as Record<string, ModelProperty>;
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.record(z.string(), z.string())
     `,
   );
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test2} />,
     d`
       z.record(z.string(), z.string())
@@ -83,7 +83,7 @@ it("works with records with properties", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.intersection(
@@ -106,7 +106,7 @@ it("works with nested objects", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -129,7 +129,7 @@ it("works with referencing other schema declarations in members", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <StatementList>
       <ZodSchemaDeclaration type={mystring} />
       <ZodSchemaDeclaration type={Test} />
@@ -155,7 +155,7 @@ it("allows name to be a getter", async () => {
   function getName() {
     return "hello" + "there";
   }
-  expectRender(
+  expectRender(runner.program,
     <StatementList>
       <ZodSchemaDeclaration type={Test} name={getName()} />
     </StatementList>,
@@ -184,7 +184,7 @@ it("renders model and property docs", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -207,12 +207,12 @@ it("works with arrays", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(<ZodSchema type={scalarArray.type} />, "z.array(z.string())");
-  expectRender(
+  expectRender(runner.program,<ZodSchema type={scalarArray.type} />, "z.array(z.string())");
+  expectRender(runner.program,
     <ZodSchema type={scalarArray2.type} />,
     "z.array(z.array(z.string()))",
   );
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={modelArray.type} />,
     d`
       z.array(z.object({
@@ -232,7 +232,7 @@ it("works with model properties with array constraints", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -249,7 +249,7 @@ it("works with array declarations", async () => {
     @test model Test is Array<string>{}
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.array(z.string()).max(5)
@@ -275,7 +275,7 @@ it("handles references", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <StatementList>
       <ZodSchemaDeclaration type={Item} />
       <ZodSchemaDeclaration type={Test} />
@@ -310,7 +310,7 @@ it("supports property defaults", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -342,7 +342,7 @@ it("supports model extends", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <List>
       <ZodSchemaDeclaration type={Point2D} />
       <ZodSchemaDeclaration type={Point3D} />
@@ -368,7 +368,7 @@ it.skip("works with circular references", async () => {
     }
   `);
 
-  expectRender(
+  expectRender(runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({

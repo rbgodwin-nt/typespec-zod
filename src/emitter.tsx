@@ -10,7 +10,7 @@ import {
   Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
-import { writeOutput } from "@typespec/emitter-framework";
+import { writeOutput, Output } from "@typespec/emitter-framework";
 import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
 import {
@@ -26,7 +26,11 @@ export async function $onEmit(context: EmitContext) {
 
   writeOutput(
     context.program,
-    <ay.Output namePolicy={tsNamePolicy} externals={[zod]}>
+    <Output
+      program={context.program}
+      namePolicy={tsNamePolicy}
+      externals={[zod]}
+    >
       <ts.SourceFile path="models.ts">
         <ay.For
           each={types}
@@ -42,8 +46,8 @@ export async function $onEmit(context: EmitContext) {
           {(type) => <ZodSchemaDeclaration type={type} export />}
         </ay.For>
       </ts.SourceFile>
-    </ay.Output>,
-    context.emitterOutputDir,
+    </Output>,
+    context.emitterOutputDir
   );
 }
 
@@ -74,7 +78,7 @@ function getAllDataTypes(program: Program) {
       union: collectType,
       scalar: collectType,
     },
-    { includeTemplateDeclaration: false },
+    { includeTemplateDeclaration: false }
   );
 
   return types;

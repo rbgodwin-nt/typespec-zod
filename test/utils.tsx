@@ -1,4 +1,5 @@
-import { Output, render } from "@alloy-js/core";
+import { render } from "@alloy-js/core";
+import { Output as AlloyOutput } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { SourceFile } from "@alloy-js/typescript";
 import {
@@ -9,17 +10,39 @@ import { expect } from "vitest";
 import { zod } from "../src/index.js";
 import { TypeSpecZodTestLibrary } from "../src/testing/index.js";
 import { HttpTestLibrary } from "@typespec/http/testing";
+import { Output } from "@typespec/emitter-framework";
+import { Program } from "@typespec/compiler";
 
-export function expectRender(children: Children, expected: string) {
+export function expectRender(
+  program: Program,
+  children: Children,
+  expected: string
+) {
   const template = (
-    <Output externals={[zod]}>
+    <Output program={program} externals={[zod]}>
       <SourceFile path="test.ts">{children}</SourceFile>
     </Output>
   );
 
   const output = render(template);
   expect(
-    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n"),
+    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n")
+  ).toBe(expected);
+}
+
+export function expectRenderPure(
+  children: Children,
+  expected: string
+) {
+  const template = (
+    <AlloyOutput externals={[zod]}>
+      <SourceFile path="test.ts">{children}</SourceFile>
+    </AlloyOutput>
+  );
+
+  const output = render(template);
+  expect(
+    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n")
   ).toBe(expected);
 }
 
@@ -42,7 +65,7 @@ export async function createTestRunner() {
 
 export async function createEmitterTestRunner(
   emitterOptions?: {},
-  includeHttp = false,
+  includeHttp = false
 ) {
   const host = await createTestHost(includeHttp);
 

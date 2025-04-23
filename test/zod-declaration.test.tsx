@@ -27,13 +27,14 @@ it("allows specifying refkey", async () => {
   );
 
   expectRender(
+    runner.program,
     template,
     d`
       const foo = z.object({
         id: z.string(),
       });
       foo;
-    `,
+    `
   );
 });
 
@@ -54,12 +55,13 @@ it.skip("allows specifying a refkey dynamically", async () => {
   );
 
   expectRender(
+    runner.program,
     template,
     d`
       const foo = z.object({
         id: z.string(),
       });
       foo;
-    `,
+    `
   );
 });

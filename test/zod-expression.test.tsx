@@ -2,7 +2,7 @@ import { d } from "@alloy-js/core/testing";
 import { FunctionCallExpression } from "@alloy-js/typescript";
 import { it } from "vitest";
 import { ZodExpression } from "../src/components/ZodExpression.jsx";
-import { expectRender } from "./utils.jsx";
+import { expectRenderPure } from "./utils.jsx";
 
 it("creates zod expressions", () => {
   const expression = (
@@ -12,10 +12,10 @@ it("creates zod expressions", () => {
     </ZodExpression>
   );
 
-  expectRender(
+  expectRenderPure(
     expression,
     d`
       z.null().optional()
-    `,
+    `
   );
 });
