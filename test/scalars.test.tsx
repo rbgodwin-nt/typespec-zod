@@ -13,7 +13,11 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,<ZodSchema type={booleanProp.type} />, "z.boolean()");
+    expectRender(
+      runner.program,
+      <ZodSchema type={booleanProp.type} />,
+      "z.boolean()",
+    );
   });
 
   it("works with string", async () => {
@@ -40,14 +44,28 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,<ZodSchema type={stringProp.type} />, "z.string()");
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
+      <ZodSchema type={stringProp.type} />,
+      "z.string()",
+    );
+    expectRender(
+      runner.program,
       <ZodSchema type={shortStringProp.type} />,
       "z.string().min(5).max(10)",
     );
-    expectRender(runner.program,<ZodSchema type={urlProp.type} />, "z.string().url()");
-    expectRender(runner.program,<ZodSchema type={uuidProp} />, "z.string().uuid()");
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
+      <ZodSchema type={urlProp.type} />,
+      "z.string().url()",
+    );
+    expectRender(
+      runner.program,
+      <ZodSchema type={uuidProp} />,
+      "z.string().uuid()",
+    );
+    expectRender(
+      runner.program,
       <ZodSchema type={patternProp} />,
       "z.string().regex(/[0-9]+/)",
     );
@@ -67,19 +85,23 @@ describe("scalars", () => {
       @test @minValueExclusive(2) scalar int8WithMinExclusive extends int8; 
       @test @minValueExclusive(2) @maxValueExclusive(20) scalar int8WithMinMaxExclusive extends int8;
     `)) as Record<string, ModelProperty>;
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int8WithMin} />,
         "z.number().int().gte(-20).lte(127)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int8WithMinMax} />,
         "z.number().int().gte(-20).lte(20)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int8WithMinExclusive} />,
         "z.number().int().gt(2).lte(127)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int8WithMinMaxExclusive} />,
         "z.number().int().gt(2).lt(20)",
       );
@@ -97,19 +119,23 @@ describe("scalars", () => {
         }
       `)) as Record<string, ModelProperty>;
 
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int8Prop.type} />,
         "z.number().int().gte(-128).lte(127)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int16Prop.type} />,
         "z.number().int().gte(-32768).lte(32767)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int32Prop.type} />,
         "z.number().int().gte(-2147483648).lte(2147483647)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={int64Prop.type} />,
         "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
       );
@@ -128,23 +154,28 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={uint8Prop.type} />,
         "z.number().int().nonnegative().lte(255)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={uint16Prop.type} />,
         "z.number().int().nonnegative().lte(65535)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={uint32Prop.type} />,
         "z.number().int().nonnegative().lte(4294967295)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={uint64Prop.type} />,
         "z.bigint().nonnegative().lte(18446744073709551615)",
       );
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={safeintProp.type} />,
         "z.number().int().safe()",
       );
@@ -160,12 +191,21 @@ describe("scalars", () => {
         }
       `)) as Record<string, ModelProperty>;
 
-      expectRender(runner.program,
+      expectRender(
+        runner.program,
         <ZodSchema type={float32Prop.type} />,
         "z.number().gte(-3.4028235e+38).lte(3.4028235e+38)",
       );
-      expectRender(runner.program,<ZodSchema type={float64Prop.type} />, "z.number()");
-      expectRender(runner.program,<ZodSchema type={floatProp.type} />, "z.number()");
+      expectRender(
+        runner.program,
+        <ZodSchema type={float64Prop.type} />,
+        "z.number()",
+      );
+      expectRender(
+        runner.program,
+        <ZodSchema type={floatProp.type} />,
+        "z.number()",
+      );
     });
 
     it("works with decimals", async () => {
@@ -177,8 +217,16 @@ describe("scalars", () => {
         }
       `)) as Record<string, ModelProperty>;
 
-      expectRender(runner.program,<ZodSchema type={decimalProp.type} />, "z.number()");
-      expectRender(runner.program,<ZodSchema type={decimal128Prop.type} />, "z.number()");
+      expectRender(
+        runner.program,
+        <ZodSchema type={decimalProp.type} />,
+        "z.number()",
+      );
+      expectRender(
+        runner.program,
+        <ZodSchema type={decimal128Prop.type} />,
+        "z.number()",
+      );
     });
   });
 
@@ -190,7 +238,11 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,<ZodSchema type={bytesProp.type} />, "z.any()");
+    expectRender(
+      runner.program,
+      <ZodSchema type={bytesProp.type} />,
+      "z.any()",
+    );
   });
 
   it("works with date things", async () => {
@@ -210,10 +262,23 @@ describe("scalars", () => {
       }
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,<ZodSchema type={plainDateProp.type} />, "z.coerce.date()");
-    expectRender(runner.program,<ZodSchema type={plainTimeProp.type} />, "z.string().time()");
-    expectRender(runner.program,<ZodSchema type={utcDateTimeProp.type} />, "z.coerce.date()");
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
+      <ZodSchema type={plainDateProp.type} />,
+      "z.coerce.date()",
+    );
+    expectRender(
+      runner.program,
+      <ZodSchema type={plainTimeProp.type} />,
+      "z.string().time()",
+    );
+    expectRender(
+      runner.program,
+      <ZodSchema type={utcDateTimeProp.type} />,
+      "z.coerce.date()",
+    );
+    expectRender(
+      runner.program,
       <ZodSchema type={offsetDateTimeProp.type} />,
       "z.coerce.date()",
     );
@@ -254,21 +319,36 @@ describe("scalars", () => {
       scalar rfc7231DateOffset extends offsetDateTime;
     `);
 
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
       <ZodSchema type={int32Date} />,
       "z.number().int().gte(-2147483648).lte(2147483647)",
     );
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
       <ZodSchema type={int64Date} />,
       "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
     );
-    expectRender(runner.program,<ZodSchema type={rfc3339DateUtc} />, "z.string().datetime()");
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
+      <ZodSchema type={rfc3339DateUtc} />,
+      "z.string().datetime()",
+    );
+    expectRender(
+      runner.program,
       <ZodSchema type={rfc3339DateOffset} />,
       "z.string().datetime()",
     );
-    expectRender(runner.program,<ZodSchema type={rfc7231DateUtc} />, "z.string()");
-    expectRender(runner.program,<ZodSchema type={rfc7231DateOffset} />, "z.string()");
+    expectRender(
+      runner.program,
+      <ZodSchema type={rfc7231DateUtc} />,
+      "z.string()",
+    );
+    expectRender(
+      runner.program,
+      <ZodSchema type={rfc7231DateOffset} />,
+      "z.string()",
+    );
   });
 
   it("works with durations and encodings", async () => {
@@ -291,13 +371,23 @@ describe("scalars", () => {
       scalar myDuration extends duration;
     `);
 
-    expectRender(runner.program,<ZodSchema type={myDuration} />, "z.string().duration()");
-    expectRender(runner.program,<ZodSchema type={isoDuration} />, "z.string().duration()");
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
+      <ZodSchema type={myDuration} />,
+      "z.string().duration()",
+    );
+    expectRender(
+      runner.program,
+      <ZodSchema type={isoDuration} />,
+      "z.string().duration()",
+    );
+    expectRender(
+      runner.program,
       <ZodSchema type={secondsDuration} />,
       "z.number().int().gte(-2147483648).lte(2147483647)",
     );
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
       <ZodSchema type={int64SecondsDuration} />,
       "z.bigint().gte(-9223372036854775808n).lte(9223372036854775807n)",
     );
@@ -309,7 +399,7 @@ describe("scalars", () => {
       @test scalar unknownScalar;
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,<ZodSchema type={unknownScalar} />, "z.any()");
+    expectRender(runner.program, <ZodSchema type={unknownScalar} />, "z.any()");
   });
 
   it("emits docs", async () => {
@@ -319,7 +409,8 @@ describe("scalars", () => {
       @test scalar unknownScalar;
     `)) as Record<string, ModelProperty>;
 
-    expectRender(runner.program,
+    expectRender(
+      runner.program,
       <ZodSchema type={unknownScalar} />,
       'z.any().describe("An unknown scalar")',
     );

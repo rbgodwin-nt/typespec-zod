@@ -51,7 +51,7 @@ export function isRecord(program: Program, type: Type): boolean {
   );
 }
 
-export function shouldReference(program: Program,type: Type) {
+export function shouldReference(program: Program, type: Type) {
   return isDeclaration(program, type) && !isBuiltIn(program, type);
 }
 
@@ -116,7 +116,7 @@ export function createCycleSets(types: Type[]): Type[][] {
 
       case "Union":
         return [...type.variants.values()].map((v) =>
-          v.kind === "UnionVariant" ? v.type : v
+          v.kind === "UnionVariant" ? v.type : v,
         );
       case "UnionVariant":
         return [type.type];

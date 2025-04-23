@@ -12,7 +12,8 @@ it("works with union expressions", async () => {
     }
   `)) as Record<string, Model>;
 
-  expectRender(runner.program,
+  expectRender(
+    runner.program,
     <ZodSchema type={Test} />,
     d`
       z.object({
@@ -32,7 +33,8 @@ it("works with discriminated unions with envelope", async () => {
     }
   `)) as Record<string, Union>;
 
-  expectRender(runner.program,
+  expectRender(
+    runner.program,
     <ZodSchema type={Test} />,
     d`
       z.discriminatedUnion(
@@ -64,7 +66,8 @@ it("works with discriminated unions without envelope", async () => {
     }
   `)) as Record<string, Union>;
 
-  expectRender(runner.program,
+  expectRender(
+    runner.program,
     <ZodSchema type={Test} />,
     d`
       z.discriminatedUnion(
@@ -93,7 +96,8 @@ it("works with non-discriminated unions", async () => {
     }
   `)) as Record<string, Union>;
 
-  expectRender(runner.program,
+  expectRender(
+    runner.program,
     <ZodSchema type={Test} />,
     d`
       z.union([

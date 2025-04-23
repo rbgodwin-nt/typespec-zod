@@ -55,7 +55,7 @@ export function modelBuilder(type: Model) {
         <ZodSchema
           type={(type.indexer ?? type.baseModel!.indexer)!.value}
           nested
-        />
+        />,
       ),
     ];
   }
@@ -101,7 +101,7 @@ export function modelBuilder(type: Model) {
       call(
         "intersection",
         <ZodExpression>{objectPart}</ZodExpression>,
-        <ZodExpression>{recordPart}</ZodExpression>
+        <ZodExpression>{recordPart}</ZodExpression>,
       ),
     ];
   } else {
@@ -110,7 +110,8 @@ export function modelBuilder(type: Model) {
 
   if (
     type.baseModel &&
-    (!isRecord($.program, type.baseModel) || isDeclaration($.program, type.baseModel))
+    (!isRecord($.program, type.baseModel) ||
+      isDeclaration($.program, type.baseModel))
   ) {
     if (isDeclaration($.program, type.baseModel)) {
       const nestedComponents = components;
@@ -118,7 +119,7 @@ export function modelBuilder(type: Model) {
         refkey(type.baseModel, refkeySym),
         call(
           "merge",
-          <MemberChainExpression>{nestedComponents}</MemberChainExpression>
+          <MemberChainExpression>{nestedComponents}</MemberChainExpression>,
         ),
       ];
     } else {

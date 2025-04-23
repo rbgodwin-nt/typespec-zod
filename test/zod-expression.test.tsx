@@ -16,6 +16,6 @@ it("creates zod expressions", () => {
     expression,
     d`
       z.null().optional()
-    `
+    `,
   );
 });

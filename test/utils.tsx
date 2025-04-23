@@ -16,7 +16,7 @@ import { Program } from "@typespec/compiler";
 export function expectRender(
   program: Program,
   children: Children,
-  expected: string
+  expected: string,
 ) {
   const template = (
     <Output program={program} externals={[zod]}>
@@ -26,14 +26,11 @@ export function expectRender(
 
   const output = render(template);
   expect(
-    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n")
+    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n"),
   ).toBe(expected);
 }
 
-export function expectRenderPure(
-  children: Children,
-  expected: string
-) {
+export function expectRenderPure(children: Children, expected: string) {
   const template = (
     <AlloyOutput externals={[zod]}>
       <SourceFile path="test.ts">{children}</SourceFile>
@@ -42,7 +39,7 @@ export function expectRenderPure(
 
   const output = render(template);
   expect(
-    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n")
+    (output.contents[0].contents as string).split(/\n/).slice(2).join("\n"),
   ).toBe(expected);
 }
 
@@ -65,7 +62,7 @@ export async function createTestRunner() {
 
 export async function createEmitterTestRunner(
   emitterOptions?: {},
-  includeHttp = false
+  includeHttp = false,
 ) {
   const host = await createTestHost(includeHttp);
 

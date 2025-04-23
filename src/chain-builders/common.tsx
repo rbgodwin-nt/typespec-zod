@@ -41,7 +41,7 @@ export function stringConstraints(type: Scalar | ModelProperty) {
 export function numericConstraints(
   type: Scalar | ModelProperty,
   intrinsicMin: number | bigint | string | undefined,
-  intrinsicMax: number | bigint | string | undefined
+  intrinsicMax: number | bigint | string | undefined,
 ) {
   const { $ } = useTsp();
 

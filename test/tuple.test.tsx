@@ -15,7 +15,8 @@ it("works", async () => {
     }
   `)) as Record<string, ModelProperty>;
 
-  expectRender(runner.program,
+  expectRender(
+    runner.program,
     <StatementList>
       <ZodSchemaDeclaration type={Ref} />
       <ZodSchemaDeclaration type={Test.type} name="tuple" />
