@@ -25,6 +25,7 @@ export async function $onEmit(context: EmitContext) {
   const tsNamePolicy = ts.createTSNamePolicy();
 
   writeOutput(
+    context.program,
     <ay.Output namePolicy={tsNamePolicy} externals={[zod]}>
       <ts.SourceFile path="models.ts">
         <ay.For
