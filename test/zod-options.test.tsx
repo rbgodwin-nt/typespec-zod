@@ -32,7 +32,7 @@ it("allows specifying refkey", async () => {
   ];
 
   const template = (
-    <ZodOptions customTypeEmit={customTypeEmit}>
+    <ZodOptions customTypeComponent={customTypeEmit}>
       <StatementList>
         <ZodSchemaDeclaration type={MyModel} />
         <ZodSchemaDeclaration type={MyModel2} />

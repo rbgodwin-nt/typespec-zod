@@ -66,8 +66,9 @@ export function modelBuilder(type: Model) {
     const membersSpec: Record<string, () => Children> = {};
 
     for (const member of type.properties.values()) {
-      if (options.emitForType.has(member.type)) {
-        membersSpec[member.name] = () => options.emitForType.get(member.type)!;
+      if (options.customTypeComponent.has(member.type)) {
+        membersSpec[member.name] = () =>
+          options.customTypeComponent.get(member.type)!;
         continue;
       }
       const memberComponents = [

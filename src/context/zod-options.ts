@@ -3,9 +3,15 @@ import { Children } from "@alloy-js/core/jsx-runtime";
 import { Type } from "@typespec/compiler";
 
 export interface ZodOptionsContext {
-  emitForType: Map<Type, Children>;
+  /**
+   * Provide custom component for rendering a specific TypeSpec type.
+   */
+  customTypeComponent: Map<Type, Children>;
 }
 
+/**
+ * Context for setting Zod options that control how Zod schemas are rendered.
+ */
 export const ZodOptionsContext: ComponentContext<ZodOptionsContext> =
   createContext(createZodOptionsContext());
 
@@ -15,6 +21,6 @@ export function useZodOptions(): ZodOptionsContext {
 
 export function createZodOptionsContext(): ZodOptionsContext {
   return {
-    emitForType: new Map(),
+    customTypeComponent: new Map(),
   };
 }

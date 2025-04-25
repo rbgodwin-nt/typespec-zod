@@ -6,13 +6,19 @@ import {
 } from "../context/zod-options.js";
 
 export interface ZodOptionsProps {
-  customTypeEmit?: [Type, Children][];
+  /**
+   * Provide custom component for rendering a specific TypeSpec type.
+   */
+  customTypeComponent?: [Type, Children][];
   children: Children;
 }
 
+/**
+ * Set ZodOptions for the children of this component.
+ */
 export function ZodOptions(props: ZodOptionsProps) {
   const context = createZodOptionsContext();
-  context.emitForType = new Map(props.customTypeEmit ?? []);
+  context.customTypeComponent = new Map(props.customTypeComponent ?? []);
 
   return (
     <ZodOptionsContext.Provider value={context}>

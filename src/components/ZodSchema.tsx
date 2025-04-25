@@ -1,10 +1,10 @@
 import { refkey } from "@alloy-js/core";
 import { MemberChainExpression } from "@alloy-js/typescript";
 import { Type } from "@typespec/compiler";
-import { typeBuilder } from "../chain-builders/type.jsx";
-import { refkeySym, shouldReference } from "../utils.jsx";
 import { useTsp } from "@typespec/emitter-framework";
+import { typeBuilder } from "../chain-builders/type.jsx";
 import { useZodOptions } from "../context/zod-options.js";
+import { refkeySym, shouldReference } from "../utils.jsx";
 
 export interface ZodSchemaProps {
   readonly type: Type;
@@ -22,8 +22,8 @@ export function ZodSchema(props: ZodSchemaProps) {
 
   const options = useZodOptions();
 
-  if (options.emitForType.has(props.type)) {
-    return options.emitForType.get(props.type)!;
+  if (options.customTypeComponent.has(props.type)) {
+    return options.customTypeComponent.get(props.type)!;
   }
 
   return (
