@@ -1,4 +1,4 @@
-import { Children } from "@alloy-js/core/jsx-runtime";
+import { Children, ComponentDefinition } from "@alloy-js/core/jsx-runtime";
 import { Type } from "@typespec/compiler";
 import {
   createZodOptionsContext,
@@ -9,7 +9,7 @@ export interface ZodOptionsProps {
   /**
    * Provide custom component for rendering a specific TypeSpec type.
    */
-  customTypeComponent?: [Type, Children][];
+  customTypeComponent?: [Type, ComponentDefinition<{ type: Type }>][];
   children: Children;
 }
 

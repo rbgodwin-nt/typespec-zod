@@ -1,12 +1,21 @@
 import { ComponentContext, createContext, useContext } from "@alloy-js/core";
-import { Children } from "@alloy-js/core/jsx-runtime";
+import { ComponentDefinition } from "@alloy-js/core/jsx-runtime";
 import { Type } from "@typespec/compiler";
+
+export type ZodCustomTypeComponentsMap = Map<
+  Type,
+  ComponentDefinition<{ type: Type }>
+>;
+export type ZodCustomTypeComponentsArray = [
+  Type,
+  ComponentDefinition<{ type: Type }>,
+][];
 
 export interface ZodOptionsContext {
   /**
    * Provide custom component for rendering a specific TypeSpec type.
    */
-  customTypeComponent: Map<Type, Children>;
+  customTypeComponent: Map<Type, ComponentDefinition<{ type: Type }>>;
 }
 
 /**

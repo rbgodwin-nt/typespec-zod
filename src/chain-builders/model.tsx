@@ -1,9 +1,14 @@
-import { refkey } from "@alloy-js/core";
+import { List, refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
-import { MemberChainExpression, ObjectExpression } from "@alloy-js/typescript";
+import {
+  MemberChainExpression,
+  ObjectExpression,
+  ObjectProperty,
+} from "@alloy-js/typescript";
 import { Model, ModelProperty } from "@typespec/compiler";
 import { useTsp } from "@typespec/emitter-framework";
 import { TSValueExpression } from "../components/TSValueExpression.jsx";
+import { ZodCustomTypeComponent } from "../components/ZodCustomTypeComponent.jsx";
 import { ZodExpression } from "../components/ZodExpression.jsx";
 import { ZodSchema } from "../components/ZodSchema.jsx";
 import { useZodOptions } from "../context/zod-options.js";
@@ -63,43 +68,54 @@ export function modelBuilder(type: Model) {
   }
 
   if (!recordPart || type.properties.size > 0) {
-    const membersSpec: Record<string, () => Children> = {};
+    const members: Children[] = [];
 
     for (const member of type.properties.values()) {
-      if (options.customTypeComponent.has(member.type)) {
-        membersSpec[member.name] = () =>
-          options.customTypeComponent.get(member.type)!;
-        continue;
-      }
-      const memberComponents = [
-        shouldReference($.program, member.type)
-          ? refkey(member.type, refkeySym)
-          : typeBuilder(member.type),
-        ...($.scalar.extendsString(member.type)
-          ? stringConstraints(member)
-          : []),
-        ...($.scalar.extendsNumeric(member.type)
-          ? numericConstraints(member, undefined, undefined)
-          : []),
-        ...($.array.is(member.type) ? arrayConstraints(member) : []),
-        ...(member.optional ? [call("optional")] : []),
-        ...defaultBuilder(member),
-        ...docBuilder(member),
-      ];
+      members.push(
+        <ZodCustomTypeComponent type={member}>
+          <ObjectProperty name={member.name}>
+            <ZodCustomTypeComponent type={member.type}>
+              {() => {
+                const memberComponents = [
+                  shouldReference($.program, member.type)
+                    ? refkey(member.type, refkeySym)
+                    : typeBuilder(member.type),
+                  ...($.scalar.extendsString(member.type)
+                    ? stringConstraints(member)
+                    : []),
+                  ...($.scalar.extendsNumeric(member.type)
+                    ? numericConstraints(member, undefined, undefined)
+                    : []),
+                  ...($.array.is(member.type) ? arrayConstraints(member) : []),
+                  ...(member.optional ? [call("optional")] : []),
+                  ...defaultBuilder(member),
+                  ...docBuilder(member),
+                ];
 
-      membersSpec[member.name] = () => {
-        if (shouldReference($.program, member.type)) {
-          return (
-            <MemberChainExpression>{memberComponents}</MemberChainExpression>
-          );
-        }
-
-        return (
-          <MemberChainExpression>{memberComponents}</MemberChainExpression>
-        );
-      };
+                return (
+                  <MemberChainExpression>
+                    {memberComponents}
+                  </MemberChainExpression>
+                );
+              }}
+            </ZodCustomTypeComponent>
+          </ObjectProperty>
+        </ZodCustomTypeComponent>,
+      );
     }
-    objectPart = [call("object", [<ObjectExpression jsValue={membersSpec} />])];
+    objectPart = [
+      call("object", [
+        <ObjectExpression
+          children={
+            members.length === 0 ? (
+              []
+            ) : (
+              <List children={members} comma softline enderPunctuation />
+            )
+          }
+        ></ObjectExpression>,
+      ]),
+    ];
   }
 
   if (recordPart && objectPart) {

@@ -1,13 +1,14 @@
-import { Children, StatementList } from "@alloy-js/core";
+import { StatementList } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
-import { Type } from "@typespec/compiler";
+import { Model } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
 import { it } from "vitest";
 import { ZodOptions } from "../src/components/ZodOptions.jsx";
+import { ZodCustomTypeComponentsArray } from "../src/context/zod-options.js";
 import { ZodSchemaDeclaration } from "../src/index.js";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
-it("allows specifying refkey", async () => {
+it("allows providing custom zod options to control how a type renders", async () => {
   const runner = await createTestRunner();
   const { MyModel, MyModel2, MyModel3 } = await runner.compile(`
     @test model MyModel {
@@ -23,12 +24,19 @@ it("allows specifying refkey", async () => {
       prop1: [string];
       prop2: string[];
       prop3: string | int32;
+      prop4: string;
     }
   `);
 
-  const customTypeEmit: [Type, Children][] = [
-    [MyModel2, <>/* MyModel */</>],
-    [$(runner.program).builtin.string, <>/* string */</>],
+  const customTypeEmit: ZodCustomTypeComponentsArray = [
+    [
+      MyModel2,
+      function (props) {
+        return <>/* {(props.type as any).name} */</>;
+      },
+    ],
+    [$(runner.program).builtin.string, () => <>/* string */</>],
+    [(MyModel3 as Model).properties.get("prop4")!, () => "prop 4!!"],
   ];
 
   const template = (
@@ -47,9 +55,9 @@ it("allows specifying refkey", async () => {
     d`
       const MyModel = z.object({
         id: /* string */,
-        m2: /* MyModel */,
+        m2: /* MyModel2 */,
       });
-      const MyModel2 = /* MyModel */;
+      const MyModel2 = /* MyModel2 */;
       const MyModel3 = z.object({
         prop1: z.tuple([/* string */]),
         prop2: z.array(/* string */),
@@ -57,6 +65,7 @@ it("allows specifying refkey", async () => {
           /* string */,
           z.number().int().gte(-2147483648).lte(2147483647)
         ]),
+        prop 4!!,
       });
     `,
   );
