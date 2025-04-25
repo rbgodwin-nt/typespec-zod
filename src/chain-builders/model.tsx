@@ -2,10 +2,12 @@ import { refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { MemberChainExpression, ObjectExpression } from "@alloy-js/typescript";
 import { Model, ModelProperty } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { useTsp } from "@typespec/emitter-framework";
 import { TSValueExpression } from "../components/TSValueExpression.jsx";
 import { ZodExpression } from "../components/ZodExpression.jsx";
 import { ZodSchema } from "../components/ZodSchema.jsx";
+import { useZodOptions } from "../context/zod-options.js";
+import { zod } from "../external-packages/zod.js";
 import {
   call,
   isDeclaration,
@@ -20,11 +22,11 @@ import {
   stringConstraints,
 } from "./common.jsx";
 import { typeBuilder } from "./type.jsx";
-import { zod } from "../external-packages/zod.js";
-import { useTsp } from "@typespec/emitter-framework";
 
 export function modelBuilder(type: Model) {
   const { $ } = useTsp();
+
+  const options = useZodOptions();
 
   if ($.array.is(type)) {
     return [
@@ -64,6 +66,10 @@ export function modelBuilder(type: Model) {
     const membersSpec: Record<string, () => Children> = {};
 
     for (const member of type.properties.values()) {
+      if (options.emitForType.has(member.type)) {
+        membersSpec[member.name] = () => options.emitForType.get(member.type)!;
+        continue;
+      }
       const memberComponents = [
         shouldReference($.program, member.type)
           ? refkey(member.type, refkeySym)

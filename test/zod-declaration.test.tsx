@@ -34,12 +34,11 @@ it("allows specifying refkey", async () => {
         id: z.string(),
       });
       foo;
-    `,
+    `
   );
 });
 
-// https://github.com/bterlson/typespec-zod/issues/3
-it.skip("allows specifying a refkey dynamically", async () => {
+it("allows specifying a refkey dynamically", async () => {
   const runner = await createTestRunner();
   const { MyModel } = await runner.compile(`
     @test model MyModel {
@@ -62,6 +61,6 @@ it.skip("allows specifying a refkey dynamically", async () => {
         id: z.string(),
       });
       foo;
-    `,
+    `
   );
 });
