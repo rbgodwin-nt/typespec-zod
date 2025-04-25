@@ -1,14 +1,8 @@
+import { refkey } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
-import { FunctionCallExpression, SourceFile } from "@alloy-js/typescript";
 import { it } from "vitest";
-import { ZodExpression } from "../src/components/ZodExpression.jsx";
-import {
-  createEmitterTestRunner,
-  createTestRunner,
-  expectRender,
-} from "./utils.jsx";
-import { Output, refkey } from "@alloy-js/core";
 import { ZodSchemaDeclaration } from "../src/index.js";
+import { createTestRunner, expectRender } from "./utils.jsx";
 
 it("allows specifying refkey", async () => {
   const rk = refkey();
@@ -34,7 +28,7 @@ it("allows specifying refkey", async () => {
         id: z.string(),
       });
       foo;
-    `
+    `,
   );
 });
 
@@ -46,10 +40,16 @@ it("allows specifying a refkey dynamically", async () => {
     }
   `);
 
+  const rk = refkey();
+  function getRefkey() {
+    return rk;
+  }
+
   const template = (
     <>
-      <ZodSchemaDeclaration type={MyModel} name="foo" refkey={refkey()} />;
+      <ZodSchemaDeclaration type={MyModel} name="foo" refkey={getRefkey()} />;
       <hbr />
+      {getRefkey()};
     </>
   );
 
@@ -61,6 +61,6 @@ it("allows specifying a refkey dynamically", async () => {
         id: z.string(),
       });
       foo;
-    `
+    `,
   );
 });
