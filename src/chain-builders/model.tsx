@@ -106,13 +106,13 @@ export function modelBuilder(type: Model) {
     objectPart = [
       call("object", [
         <ObjectExpression
-          children={
-            members.length === 0 ? (
-              []
-            ) : (
-              <List children={members} comma softline enderPunctuation />
-            )
-          }
+          {...(members.length === 0
+            ? {}
+            : {
+                children: (
+                  <List children={members} comma softline enderPunctuation />
+                ),
+              })}
         ></ObjectExpression>,
       ]),
     ];
