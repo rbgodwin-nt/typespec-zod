@@ -2,23 +2,16 @@ import * as ay from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import {
   EmitContext,
-  Enum,
   ListenerFlow,
   navigateProgram,
-  navigateType,
   Program,
   Type,
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
-import { writeOutput, Output } from "@typespec/emitter-framework";
+import { Output, writeOutput } from "@typespec/emitter-framework";
 import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
-import {
-  createCycleSets,
-  isBuiltIn,
-  isDeclaration,
-  shouldReference,
-} from "./utils.jsx";
+import { createCycleSets, shouldReference } from "./utils.jsx";
 
 export async function $onEmit(context: EmitContext) {
   const types = createCycleSets(getAllDataTypes(context.program)).flat(1);

@@ -1,17 +1,17 @@
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { ModelProperty, Scalar } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { useTsp } from "@typespec/emitter-framework";
+import { zod } from "../external-packages/zod.js";
 import { call, isBuiltIn } from "../utils.jsx";
 import {
   docBuilder,
   numericConstraints,
   stringConstraints,
 } from "./common.jsx";
-import { zod } from "../external-packages/zod.js";
-import { useTsp } from "@typespec/emitter-framework";
 
 export function scalarBuilder(type: Scalar): Children[] {
   const { $ } = useTsp();
+
   let components: Children[] = [];
   if ($.scalar.extendsBoolean(type)) {
     components = [zod.z, call("boolean")];

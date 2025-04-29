@@ -7,17 +7,28 @@ import {
   Scalar,
   Type,
 } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
-import { call } from "../utils.jsx";
 import { useTsp } from "@typespec/emitter-framework";
+import { call, shouldReference } from "../utils.jsx";
 
 export function stringConstraints(type: Scalar | ModelProperty) {
   const { $ } = useTsp();
   const components = [];
-  const minLength = $.type.minLength(type);
-  const maxLength = $.type.maxLength(type);
-  const pattern = getPattern($.program, type);
-  const format = getFormat($.program, type);
+  const decoratorSources = [type];
+  if ($.scalar.is(type)) {
+    let currentType: Scalar | undefined = type.baseScalar;
+    while (currentType && shouldReference($.program, currentType)) {
+      decoratorSources.push(currentType);
+      currentType = currentType.baseScalar;
+    }
+  }
+
+  let minLength, maxLength, pattern, format;
+  for (const source of decoratorSources) {
+    minLength = minLength ?? $.type.minLength(source);
+    maxLength = maxLength ?? $.type.maxLength(source);
+    pattern = pattern ?? getPattern($.program, source);
+    format = format ?? getFormat($.program, source);
+  }
 
   if (minLength !== undefined) {
     components.push(call("min", minLength));
@@ -46,12 +57,34 @@ export function numericConstraints(
   const { $ } = useTsp();
 
   const components: Children[] = [];
-  const decoratorConstraints = {
-    min: $.type.minValue(type),
-    minExclusive: $.type.minValueExclusive(type),
-    max: $.type.maxValue(type),
-    maxExclusive: $.type.maxValueExclusive(type),
+  const decoratorSources = [];
+  if ($.scalar.is(type)) {
+    let currentType: Scalar | undefined = type;
+    while (currentType && shouldReference($.program, currentType)) {
+      decoratorSources.push(currentType);
+      currentType = currentType.baseScalar;
+    }
+  } else {
+    decoratorSources.push(type);
+  }
+  const decoratorConstraints: Record<string, number | undefined> = {
+    min: undefined,
+    minExclusive: undefined,
+    max: undefined,
+    maxExclusive: undefined,
   };
+
+  for (const source of decoratorSources) {
+    decoratorConstraints.min =
+      decoratorConstraints.min ?? $.type.minValue(source);
+    decoratorConstraints.minExclusive =
+      decoratorConstraints.minExclusive ?? $.type.minValueExclusive(source);
+    decoratorConstraints.max =
+      decoratorConstraints.max ?? $.type.maxValue(source);
+    decoratorConstraints.maxExclusive =
+      decoratorConstraints.maxExclusive ?? $.type.maxValueExclusive(source);
+  }
+
   if (
     decoratorConstraints.min === undefined &&
     decoratorConstraints.minExclusive === undefined

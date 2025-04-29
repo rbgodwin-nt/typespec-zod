@@ -1,11 +1,18 @@
-import { refkey } from "@alloy-js/core";
+import { List, refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
-import { MemberChainExpression, ObjectExpression } from "@alloy-js/typescript";
+import {
+  MemberChainExpression,
+  ObjectExpression,
+  ObjectProperty,
+} from "@alloy-js/typescript";
 import { Model, ModelProperty } from "@typespec/compiler";
-import { $ } from "@typespec/compiler/experimental/typekit";
+import { useTsp } from "@typespec/emitter-framework";
 import { TSValueExpression } from "../components/TSValueExpression.jsx";
+import { ZodCustomTypeComponent } from "../components/ZodCustomTypeComponent.jsx";
 import { ZodExpression } from "../components/ZodExpression.jsx";
 import { ZodSchema } from "../components/ZodSchema.jsx";
+import { useZodOptions } from "../context/zod-options.js";
+import { zod } from "../external-packages/zod.js";
 import {
   call,
   isDeclaration,
@@ -20,11 +27,11 @@ import {
   stringConstraints,
 } from "./common.jsx";
 import { typeBuilder } from "./type.jsx";
-import { zod } from "../external-packages/zod.js";
-import { useTsp } from "@typespec/emitter-framework";
 
 export function modelBuilder(type: Model) {
   const { $ } = useTsp();
+
+  const options = useZodOptions();
 
   if ($.array.is(type)) {
     return [
@@ -61,38 +68,54 @@ export function modelBuilder(type: Model) {
   }
 
   if (!recordPart || type.properties.size > 0) {
-    const membersSpec: Record<string, () => Children> = {};
+    const members: Children[] = [];
 
     for (const member of type.properties.values()) {
-      const memberComponents = [
-        shouldReference($.program, member.type)
-          ? refkey(member.type, refkeySym)
-          : typeBuilder(member.type),
-        ...($.scalar.extendsString(member.type)
-          ? stringConstraints(member)
-          : []),
-        ...($.scalar.extendsNumeric(member.type)
-          ? numericConstraints(member, undefined, undefined)
-          : []),
-        ...($.array.is(member.type) ? arrayConstraints(member) : []),
-        ...(member.optional ? [call("optional")] : []),
-        ...defaultBuilder(member),
-        ...docBuilder(member),
-      ];
+      members.push(
+        <ZodCustomTypeComponent type={member} declare>
+          <ObjectProperty name={member.name}>
+            <ZodCustomTypeComponent type={member.type} reference>
+              {() => {
+                const memberComponents = [
+                  shouldReference($.program, member.type, options)
+                    ? refkey(member.type, refkeySym)
+                    : typeBuilder(member.type),
+                  ...($.scalar.extendsString(member.type)
+                    ? stringConstraints(member)
+                    : []),
+                  ...($.scalar.extendsNumeric(member.type)
+                    ? numericConstraints(member, undefined, undefined)
+                    : []),
+                  ...($.array.is(member.type) ? arrayConstraints(member) : []),
+                  ...(member.optional ? [call("optional")] : []),
+                  ...defaultBuilder(member),
+                  ...docBuilder(member),
+                ];
 
-      membersSpec[member.name] = () => {
-        if (shouldReference($.program, member.type)) {
-          return (
-            <MemberChainExpression>{memberComponents}</MemberChainExpression>
-          );
-        }
-
-        return (
-          <MemberChainExpression>{memberComponents}</MemberChainExpression>
-        );
-      };
+                return (
+                  <MemberChainExpression>
+                    {memberComponents}
+                  </MemberChainExpression>
+                );
+              }}
+            </ZodCustomTypeComponent>
+          </ObjectProperty>
+        </ZodCustomTypeComponent>,
+      );
     }
-    objectPart = [call("object", [<ObjectExpression jsValue={membersSpec} />])];
+    objectPart = [
+      call("object", [
+        <ObjectExpression
+          {...(members.length === 0
+            ? {}
+            : {
+                children: (
+                  <List children={members} comma softline enderPunctuation />
+                ),
+              })}
+        ></ObjectExpression>,
+      ]),
+    ];
   }
 
   if (recordPart && objectPart) {

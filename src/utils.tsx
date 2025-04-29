@@ -2,6 +2,7 @@ import { Children } from "@alloy-js/core/jsx-runtime";
 import { FunctionCallExpression } from "@alloy-js/typescript";
 import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/experimental/typekit";
+import { ZodOptionsContext } from "./context/zod-options.js";
 
 export const refkeySym = Symbol.for("typespec-zod.refkey");
 
@@ -51,8 +52,16 @@ export function isRecord(program: Program, type: Type): boolean {
   );
 }
 
-export function shouldReference(program: Program, type: Type) {
-  return isDeclaration(program, type) && !isBuiltIn(program, type);
+export function shouldReference(
+  program: Program,
+  type: Type,
+  options?: ZodOptionsContext,
+) {
+  return (
+    isDeclaration(program, type) &&
+    !isBuiltIn(program, type) &&
+    (!options || !options.getEmitOptionsFor(program, type)?.noDeclaration)
+  );
 }
 
 export function isBuiltIn(program: Program, type: Type) {

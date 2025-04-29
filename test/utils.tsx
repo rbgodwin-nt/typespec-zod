@@ -1,17 +1,16 @@
-import { render } from "@alloy-js/core";
-import { Output as AlloyOutput } from "@alloy-js/core";
+import { Output as AlloyOutput, render } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { SourceFile } from "@alloy-js/typescript";
+import { Program } from "@typespec/compiler";
 import {
   createTestHost as coreCreateTestHost,
   createTestWrapper,
 } from "@typespec/compiler/testing";
+import { Output } from "@typespec/emitter-framework";
+import { HttpTestLibrary } from "@typespec/http/testing";
 import { expect } from "vitest";
 import { zod } from "../src/index.js";
 import { TypeSpecZodTestLibrary } from "../src/testing/index.js";
-import { HttpTestLibrary } from "@typespec/http/testing";
-import { Output } from "@typespec/emitter-framework";
-import { Program } from "@typespec/compiler";
 
 export function expectRender(
   program: Program,
