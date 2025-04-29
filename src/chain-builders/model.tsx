@@ -72,12 +72,12 @@ export function modelBuilder(type: Model) {
 
     for (const member of type.properties.values()) {
       members.push(
-        <ZodCustomTypeComponent type={member}>
+        <ZodCustomTypeComponent type={member} declare>
           <ObjectProperty name={member.name}>
-            <ZodCustomTypeComponent type={member.type}>
+            <ZodCustomTypeComponent type={member.type} reference>
               {() => {
                 const memberComponents = [
-                  shouldReference($.program, member.type)
+                  shouldReference($.program, member.type, options)
                     ? refkey(member.type, refkeySym)
                     : typeBuilder(member.type),
                   ...($.scalar.extendsString(member.type)

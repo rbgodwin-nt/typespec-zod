@@ -1,15 +1,15 @@
-import { Children, ComponentDefinition } from "@alloy-js/core/jsx-runtime";
-import { Type } from "@typespec/compiler";
+import { Children } from "@alloy-js/core/jsx-runtime";
 import {
   createZodOptionsContext,
   ZodOptionsContext,
+  ZodTypeEmitOptions,
 } from "../context/zod-options.js";
 
 export interface ZodOptionsProps {
   /**
    * Provide custom component for rendering a specific TypeSpec type.
    */
-  customTypeComponent?: [Type, ComponentDefinition<{ type: Type }>][];
+  typeEmitOptions?: ZodTypeEmitOptions[];
   children: Children;
 }
 
@@ -18,7 +18,10 @@ export interface ZodOptionsProps {
  */
 export function ZodOptions(props: ZodOptionsProps) {
   const context = createZodOptionsContext();
-  context.customTypeComponent = new Map(props.customTypeComponent ?? []);
+
+  context.typeEmitOptions = new Map(
+    props.typeEmitOptions?.map((v) => [v.type, v]),
+  );
 
   return (
     <ZodOptionsContext.Provider value={context}>

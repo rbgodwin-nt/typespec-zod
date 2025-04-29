@@ -1,6 +1,7 @@
 import * as ay from "@alloy-js/core";
 import * as ts from "@alloy-js/typescript";
 import { refkeySym } from "../utils.jsx";
+import { ZodCustomTypeComponent } from "./ZodCustomTypeComponent.jsx";
 import { ZodSchema, ZodSchemaProps } from "./ZodSchema.jsx";
 
 interface ZodSchemaDeclarationProps
@@ -33,8 +34,10 @@ export function ZodSchemaDeclaration(props: ZodSchemaDeclarationProps) {
   });
 
   return (
-    <ts.VarDeclaration {...newProps}>
-      <ZodSchema {...zodSchemaProps} />
-    </ts.VarDeclaration>
+    <ZodCustomTypeComponent type={props.type} declare>
+      <ts.VarDeclaration {...newProps}>
+        <ZodSchema {...zodSchemaProps} />
+      </ts.VarDeclaration>
+    </ZodCustomTypeComponent>
   );
 }
