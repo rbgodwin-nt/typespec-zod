@@ -2,8 +2,8 @@ import { For } from "@alloy-js/core";
 import { ArrayExpression } from "@alloy-js/typescript";
 import { Tuple } from "@typespec/compiler";
 import { ZodSchema } from "../components/ZodSchema.jsx";
-import { call } from "../utils.jsx";
 import { zod } from "../external-packages/zod.js";
+import { call } from "../utils.jsx";
 
 export function tupleBuilder(type: Tuple) {
   return [

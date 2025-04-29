@@ -1,8 +1,8 @@
 import { For } from "@alloy-js/core";
 import { ArrayExpression, ValueExpression } from "@alloy-js/typescript";
 import { Enum } from "@typespec/compiler";
-import { call } from "../utils.jsx";
 import { zod } from "../external-packages/zod.js";
+import { call } from "../utils.jsx";
 
 export function enumBuilder(en: Enum) {
   return [

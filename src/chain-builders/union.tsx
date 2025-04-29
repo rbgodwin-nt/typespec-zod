@@ -5,10 +5,10 @@ import {
   ignoreDiagnostics,
   Union,
 } from "@typespec/compiler";
-import { ZodSchema } from "../components/ZodSchema.jsx";
-import { call } from "../utils.jsx";
-import { zod } from "../external-packages/zod.js";
 import { useTsp } from "@typespec/emitter-framework";
+import { ZodSchema } from "../components/ZodSchema.jsx";
+import { zod } from "../external-packages/zod.js";
+import { call } from "../utils.jsx";
 
 export function unionBuilder(type: Union) {
   const { $ } = useTsp();

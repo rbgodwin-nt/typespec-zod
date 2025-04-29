@@ -1,7 +1,7 @@
 import { Children } from "@alloy-js/core/jsx-runtime";
 import { IntrinsicType } from "@typespec/compiler";
-import { call } from "../utils.jsx";
 import { zod } from "../external-packages/zod.js";
+import { call } from "../utils.jsx";
 
 export function intrinsicBuilder(type: IntrinsicType): Children[] {
   switch (type.name) {
