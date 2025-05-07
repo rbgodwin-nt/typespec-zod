@@ -15,7 +15,7 @@ interface ZodSchemaDeclarationProps
  */
 export function ZodSchemaDeclaration(props: ZodSchemaDeclarationProps) {
   const internalRk = ay.refkey(props.type, refkeySym);
-
+  console.log("Created internal rk", internalRk);
   const [zodSchemaProps, varDeclProps] = ay.splitProps(props, [
     "type",
     "nested",

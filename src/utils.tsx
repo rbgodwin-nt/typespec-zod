@@ -1,8 +1,10 @@
+import { Refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
-import { FunctionCallExpression } from "@alloy-js/typescript";
+import { FunctionCallExpression, MemberExpression } from "@alloy-js/typescript";
 import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { ZodOptionsContext } from "./context/zod-options.js";
+import { zod } from "./external-packages/zod.js";
 
 export const refkeySym = Symbol.for("typespec-zod.refkey");
 
@@ -60,7 +62,7 @@ export function shouldReference(
   return (
     isDeclaration(program, type) &&
     !isBuiltIn(program, type) &&
-    (!options || !options.getEmitOptionsFor(program, type)?.noDeclaration)
+    (!options || !options.getEmitOptionsForType(program, type)?.noDeclaration)
   );
 }
 
@@ -195,4 +197,29 @@ export function createCycleSets(types: Type[]): Type[][] {
 
 export function call(target: string, ...args: Children[]) {
   return <FunctionCallExpression target={target} args={args} />;
+}
+
+export function memberExpr(...parts: Children[]) {
+  return <MemberExpression children={parts} />;
+}
+
+export function zodMemberExpr(...parts: Children[]) {
+  return memberExpr(refkeyPart(zod.z), ...parts);
+}
+
+export function idPart(id: string) {
+  return <MemberExpression.Part id={id} />;
+}
+
+export function refkeyPart(refkey: Refkey) {
+  return <MemberExpression.Part refkey={refkey} />;
+}
+
+export function callPart(target: string | Refkey, ...args: Children[]) {
+  return (
+    <MemberExpression>
+      {typeof target === "string" ? idPart(target) : refkeyPart(target)}
+      <MemberExpression.Part args={args} />;
+    </MemberExpression>
+  );
 }

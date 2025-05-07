@@ -4,13 +4,65 @@ import { Model } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { it } from "vitest";
 import { ZodOptions } from "../src/components/ZodOptions.jsx";
-import { ZodTypeEmitOptions } from "../src/context/zod-options.js";
+import { ZodCustomEmitOptions } from "../src/context/zod-options.js";
 import { ZodSchemaDeclaration } from "../src/index.js";
 import { createTestRunner, expectRender } from "./utils.jsx";
 
+it("can customize specific model and model properties", async () => {
+  const runner = await createTestRunner();
+  const { MyModel, MyModel2, MyModel3 } = await runner.compile(`
+    @test model MyModel {
+      id: string;
+      m2: MyModel2;
+      m3: MyModel3;
+    }
+    
+    @test model MyModel2 {
+      prop: string;
+    }
+    
+    @test model MyModel3 {
+      prop: int32;
+    }
+  `);
+
+  const customTypeEmit: ZodCustomEmitOptions[] = [
+    {
+      type: MyModel,
+      declare: (props) => <>/* MyModel */ {props.default}</>,
+    },
+    {
+      type: (MyModel2 as Model).properties.get("prop")!,
+      declare: () => <>/* a neat property */</>,
+    },
+    {
+      type: MyModel3,
+      reference(props) {
+        return <>/* ref to my model 3 */</>;
+      },
+    },
+  ];
+
+  const template = (
+    <ZodOptions customEmitOptions={customTypeEmit}>
+      <StatementList>
+        <ZodSchemaDeclaration type={MyModel} />
+        <ZodSchemaDeclaration type={MyModel2} />
+        <ZodSchemaDeclaration type={MyModel3} />
+      </StatementList>
+    </ZodOptions>
+  );
+
+  expectRender(
+    runner.program,
+    template,
+    d`
+    `,
+  );
+});
 it("allows providing custom zod options to control how a type renders", async () => {
   const runner = await createTestRunner();
-  const { MyModel, MyModel2, MyModel3, MyModel4, shortString } =
+  const { MyModel, MyModel2, MyModel3, MyModel4, shortString, MyEnum } =
     await runner.compile(`
     @maxLength(10)
     @test
@@ -39,9 +91,13 @@ it("allows providing custom zod options to control how a type renders", async ()
     
     @test model MyModel4 {
     }
+
+    @test enum MyEnum {
+      A
+    }
   `);
 
-  const customTypeEmit: ZodTypeEmitOptions[] = [
+  const customTypeEmit: ZodCustomEmitOptions[] = [
     { type: MyModel2, reference: () => <>/* MyModel2 */</> },
     {
       type: $(runner.program).builtin.string,
@@ -70,15 +126,34 @@ it("allows providing custom zod options to control how a type renders", async ()
         return <>/* {props.default} */ null</>;
       },
     },
+    {
+      typeKind: "Enum",
+      declare(props) {
+        return (
+          <>
+            // a nice enum
+            <hbr />
+            {props.default}
+          </>
+        );
+      },
+    },
+    {
+      typeKind: "EnumMember",
+      declare(props) {
+        return "Enum member!!!";
+      },
+    },
   ];
 
   const template = (
-    <ZodOptions typeEmitOptions={customTypeEmit}>
+    <ZodOptions customEmitOptions={customTypeEmit}>
       <StatementList>
         <ZodSchemaDeclaration type={MyModel} />
         <ZodSchemaDeclaration type={MyModel2} />
         <ZodSchemaDeclaration type={MyModel3} />
         <ZodSchemaDeclaration type={MyModel4} />
+        <ZodSchemaDeclaration type={MyEnum} />
       </StatementList>
     </ZodOptions>
   );

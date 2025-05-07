@@ -1,7 +1,7 @@
 import { List, refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
 import {
-  MemberChainExpression,
+  MemberExpression,
   ObjectExpression,
   ObjectProperty,
 } from "@alloy-js/typescript";
@@ -92,11 +92,7 @@ export function modelBuilder(type: Model) {
                   ...docBuilder(member),
                 ];
 
-                return (
-                  <MemberChainExpression>
-                    {memberComponents}
-                  </MemberChainExpression>
-                );
+                return <MemberExpression>{memberComponents}</MemberExpression>;
               }}
             </ZodCustomTypeComponent>
           </ObjectProperty>
@@ -140,10 +136,7 @@ export function modelBuilder(type: Model) {
       const nestedComponents = components;
       components = [
         refkey(type.baseModel, refkeySym),
-        call(
-          "merge",
-          <MemberChainExpression>{nestedComponents}</MemberChainExpression>,
-        ),
+        call("merge", <MemberExpression>{nestedComponents}</MemberExpression>),
       ];
     } else {
       components.push(...modelBuilder(type.baseModel));

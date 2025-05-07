@@ -9,43 +9,72 @@ export type ZodCustomTypeComponent = ComponentDefinition<{
   default: Children;
 }>;
 
-export interface ZodTypeEmitOptions {
-  type: Type;
+export interface ZodCustomEmitOptionsBase {
   declare?: ZodCustomTypeComponent;
   reference?: ZodCustomTypeComponent;
   noDeclaration?: boolean;
 }
 
-export type ZodCustomTypeComponentsMap = Map<Type, ZodTypeEmitOptions>;
+export interface ZodCustomTypeEmitOptions extends ZodCustomEmitOptionsBase {
+  type: Type;
+}
+
+export interface ZodCustomTypeKindEmitOptions extends ZodCustomEmitOptionsBase {
+  typeKind: Type["kind"];
+}
+
+export type ZodCustomEmitOptions =
+  | ZodCustomTypeEmitOptions
+  | ZodCustomTypeKindEmitOptions;
+
+type ZodCustomTypeOptionsMap = Map<Type, ZodCustomTypeEmitOptions>;
+type ZodCustomTypeKindOptionsMap = Map<
+  Type["kind"],
+  ZodCustomTypeKindEmitOptions
+>;
 
 export interface ZodOptionsContext {
   /**
    * Provide custom component for rendering a specific TypeSpec type.
    */
-  typeEmitOptions: Map<Type, ZodTypeEmitOptions>;
+  typeEmitOptions: ZodCustomTypeOptionsMap;
+  typeKindEmitOptions: ZodCustomTypeKindOptionsMap;
+
   /**
    * Get emit options for a specific type.
    */
-  getEmitOptionsFor(
+  getEmitOptionsForType(
     program: Program,
     type: Type,
-  ): ZodTypeEmitOptions | undefined;
+  ): ZodCustomTypeEmitOptions | undefined;
+
+  getEmitOptionsForTypeKind(
+    program: Program,
+    typeKind: Type["kind"],
+  ): ZodCustomTypeKindEmitOptions | undefined;
 }
 
 /**
  * Context for setting Zod options that control how Zod schemas are rendered.
  */
 export const ZodOptionsContext: ComponentContext<ZodOptionsContext> =
-  createContext(createZodOptionsContext());
+  createContext(createZodOptionsContext({}));
 
 export function useZodOptions(): ZodOptionsContext {
   return useContext(ZodOptionsContext)!;
 }
 
-export function createZodOptionsContext(): ZodOptionsContext {
-  return {
+interface CreateZodOptionsContextOptions {
+  customEmitOptions?: ZodCustomEmitOptions[];
+}
+export function createZodOptionsContext(
+  options: CreateZodOptionsContextOptions,
+): ZodOptionsContext {
+  const context: ZodOptionsContext = {
     typeEmitOptions: new Map(),
-    getEmitOptionsFor(program, type) {
+    typeKindEmitOptions: new Map(),
+
+    getEmitOptionsForType(program, type) {
       let options = this.typeEmitOptions.get(type);
       if (options || !$(program).scalar.is(type) || isBuiltIn(program, type)) {
         return options;
@@ -68,5 +97,19 @@ export function createZodOptionsContext(): ZodOptionsContext {
 
       return this.typeEmitOptions.get(currentScalar);
     },
+
+    getEmitOptionsForTypeKind(_, typeKind) {
+      return this.typeKindEmitOptions.get(typeKind);
+    },
   };
+
+  for (const emitOption of options.customEmitOptions ?? []) {
+    if ("type" in emitOption) {
+      context.typeEmitOptions.set(emitOption.type, emitOption);
+    } else {
+      context.typeKindEmitOptions.set(emitOption.typeKind, emitOption);
+    }
+  }
+
+  return context;
 }
