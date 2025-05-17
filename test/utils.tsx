@@ -24,7 +24,6 @@ export function expectRender(
   );
 
   const output = render(template);
-  console.log(output.contents[0].contents);
   expect(
     (output.contents[0].contents as string).split(/\n/).slice(2).join("\n"),
   ).toBe(expected);

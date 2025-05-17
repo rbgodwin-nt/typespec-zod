@@ -3,7 +3,10 @@ import { Children } from "@alloy-js/core/jsx-runtime";
 import { FunctionCallExpression, MemberExpression } from "@alloy-js/typescript";
 import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
-import { ZodOptionsContext } from "./context/zod-options.js";
+import {
+  getEmitOptionsForType,
+  ZodOptionsContext,
+} from "./context/zod-options.js";
 import { zod } from "./external-packages/zod.js";
 
 export const refkeySym = Symbol.for("typespec-zod.refkey");
@@ -62,11 +65,16 @@ export function shouldReference(
   return (
     isDeclaration(program, type) &&
     !isBuiltIn(program, type) &&
-    (!options || !options.getEmitOptionsForType(program, type)?.noDeclaration)
+    (!options ||
+      !getEmitOptionsForType(program, type, options?.customEmit)?.noDeclaration)
   );
 }
 
 export function isBuiltIn(program: Program, type: Type) {
+  if (type.kind === "ModelProperty" && type.model) {
+    type = type.model;
+  }
+
   if (!("namespace" in type) || type.namespace === undefined) {
     return false;
   }

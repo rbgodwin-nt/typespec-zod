@@ -8,16 +8,10 @@ import {
 } from "@typespec/compiler";
 import { Typekit } from "@typespec/compiler/typekit";
 import { useTsp } from "@typespec/emitter-framework";
-import { callPart, isBuiltIn } from "./utils.jsx";
+import { callPart } from "./utils.jsx";
 
-export function zodConstraintsParts(type: Type) {
+export function zodConstraintsParts(type: Type, member?: ModelProperty) {
   const { $ } = useTsp();
-  let member: ModelProperty | undefined;
-
-  if ($.modelProperty.is(type)) {
-    member = type;
-    type = type.type;
-  }
 
   let constraintParts: Children[] = [];
   if ($.scalar.extendsNumeric(type)) {
@@ -37,43 +31,11 @@ export function zodConstraintsParts(type: Type) {
         intrinsicNumericConstraints($, encoding.type),
       );
     }
+  } else if ($.array.is(type)) {
+    constraintParts = arrayConstraints($, type, member);
   }
 
-  return [
-    ...constraintParts,
-    ...descriptionParts($, type, member),
-    ...optionalParts($, type, member),
-  ];
-}
-
-function optionalParts($: Typekit, type: Type, member?: ModelProperty) {
-  if (!member || !member.optional) {
-    return [];
-  }
-
-  return [callPart("optional")];
-}
-
-function descriptionParts($: Typekit, type: Type, member?: ModelProperty) {
-  const sources = getDecoratorSources($, type, member);
-  let doc: string | undefined;
-  for (const source of sources) {
-    if (isBuiltIn($.program, source)) {
-      continue;
-    }
-
-    const sourceDoc = $.type.getDoc(source);
-
-    if (sourceDoc) {
-      doc = sourceDoc;
-      break;
-    }
-  }
-  const parts: Children[] = [];
-  if (doc) {
-    parts.push(callPart("describe", `"${doc.replace(/\n+/g, " ")}"`));
-  }
-  return parts;
+  return constraintParts;
 }
 
 interface StringConstraints {
@@ -205,7 +167,6 @@ function numericConstraintsParts(
   const intrinsicConstraints = intrinsicNumericConstraints($, type);
   const decoratorConstraints = decoratorNumericConstraints($, sources);
 
-  console.log({ intrinsicConstraints, decoratorConstraints });
   if (
     decoratorConstraints.min !== undefined &&
     decoratorConstraints.minExclusive !== undefined
@@ -401,75 +362,42 @@ function assignNumericConstraints(
   target.maxExclusive = minNumeric(source.maxExclusive, target.maxExclusive);
   target.safe = target.safe ?? source.safe;
 }
-/*
-export function numericConstraints(
-  type: Scalar | ModelProperty,
-  intrinsicMin: number | bigint | string | undefined,
-  intrinsicMax: number | bigint | string | undefined,
-) {
-  const { $ } = useTsp();
 
-  const components: Children[] = [];
-  const decoratorSources = [];
-  if ($.scalar.is(type)) {
-    let currentType: Scalar | undefined = type;
-    while (currentType && shouldReference($.program, currentType)) {
-      decoratorSources.push(currentType);
-      currentType = currentType.baseScalar;
-    }
-  } else {
-    decoratorSources.push(type);
-  }
-  const decoratorConstraints: Record<string, number | undefined> = {
-    min: undefined,
-    minExclusive: undefined,
-    max: undefined,
-    maxExclusive: undefined,
+interface ArrayConstraints {
+  minItems?: number;
+  maxItems?: number;
+}
+
+function arrayConstraints($: Typekit, type: Type, member?: ModelProperty) {
+  const sources = getDecoratorSources($, type, member);
+  const constraints: ArrayConstraints = {
+    minItems: $.type.minItems(type),
+    maxItems: $.type.maxItems(type),
+  };
+  const memberConstraints: ArrayConstraints = {
+    minItems: member && $.type.minItems(member),
+    maxItems: member && $.type.maxItems(member),
   };
 
-  for (const source of decoratorSources) {
-    decoratorConstraints.min =
-      decoratorConstraints.min ?? $.type.minValue(source);
-    decoratorConstraints.minExclusive =
-      decoratorConstraints.minExclusive ?? $.type.minValueExclusive(source);
-    decoratorConstraints.max =
-      decoratorConstraints.max ?? $.type.maxValue(source);
-    decoratorConstraints.maxExclusive =
-      decoratorConstraints.maxExclusive ?? $.type.maxValueExclusive(source);
+  assignArrayConstraints(constraints, memberConstraints);
+
+  const parts = [];
+
+  if (constraints.minItems && constraints.minItems > 0) {
+    parts.push(callPart("min", constraints.minItems));
   }
 
-  if (
-    decoratorConstraints.min === undefined &&
-    decoratorConstraints.minExclusive === undefined
-  ) {
-    intrinsicMin !== undefined &&
-      components.push(call("gte", String(intrinsicMin)));
-  } else {
-    if (decoratorConstraints.min !== undefined) {
-      components.push(call("gte", decoratorConstraints.min));
-    }
-
-    if (decoratorConstraints.minExclusive !== undefined) {
-      components.push(call("gt", decoratorConstraints.minExclusive));
-    }
+  if (constraints.maxItems && constraints.maxItems > 0) {
+    parts.push(callPart("max", constraints.maxItems));
   }
 
-  if (
-    decoratorConstraints.max === undefined &&
-    decoratorConstraints.maxExclusive === undefined
-  ) {
-    intrinsicMax !== undefined &&
-      components.push(call("lte", String(intrinsicMax)));
-  } else {
-    if (decoratorConstraints.max !== undefined) {
-      components.push(call("lte", decoratorConstraints.max));
-    }
-
-    if (decoratorConstraints.maxExclusive !== undefined) {
-      components.push(call("lt", decoratorConstraints.maxExclusive));
-    }
-  }
-
-  return components;
+  return parts;
 }
-  */
+
+function assignArrayConstraints(
+  target: ArrayConstraints,
+  source: ArrayConstraints,
+) {
+  target.minItems = maxNumeric(target.minItems, source.minItems);
+  target.maxItems = minNumeric(target.maxItems, source.maxItems);
+}

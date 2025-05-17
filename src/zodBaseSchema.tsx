@@ -1,6 +1,7 @@
-import { For } from "@alloy-js/core";
+import { Children, For, refkey } from "@alloy-js/core";
 import {
   ArrayExpression,
+  MemberExpression,
   ObjectExpression,
   ObjectProperty,
 } from "@alloy-js/typescript";
@@ -15,12 +16,15 @@ import {
 } from "@typespec/compiler";
 import { Typekit } from "@typespec/compiler/typekit";
 import { useTsp } from "@typespec/emitter-framework";
+import { ZodCustomTypeComponent } from "./components/ZodCustomTypeComponent.jsx";
 import { ZodSchema } from "./components/ZodSchema.jsx";
 import {
   callPart,
   idPart,
   isDeclaration,
   isRecord,
+  refkeySym,
+  shouldReference,
   zodMemberExpr,
 } from "./utils.jsx";
 
@@ -136,7 +140,25 @@ function enumBaseType(type: Enum) {
   const values = Array.from(type.members.values()).map(
     (member) => member.value ?? member.name,
   );
-  return zodMemberExpr(callPart("enum", <ArrayExpression jsValue={values} />));
+  return zodMemberExpr(
+    callPart(
+      "enum",
+      <ArrayExpression>
+        <For each={type.members.values()} comma line>
+          {(member) => (
+            <ZodCustomTypeComponent
+              type={member}
+              Declaration={(props: { children?: Children }) => props.children}
+              declarationProps={{}}
+              declare
+            >
+              {JSON.stringify(member.value ?? member.name)}
+            </ZodCustomTypeComponent>
+          )}
+        </For>
+      </ArrayExpression>,
+    ),
+  );
 }
 
 function tupleBaseType(type: Tuple) {
@@ -155,21 +177,23 @@ function tupleBaseType(type: Tuple) {
 }
 
 function modelBaseType(type: Model) {
-  // Only the base z.object({...}) or z.array(...) or z.record(...)
   const { $ } = useTsp();
+
   if ($.array.is(type)) {
     return zodMemberExpr(
       callPart("array", <ZodSchema type={type.indexer!.value} nested />),
     );
   }
 
+  let recordPart: Children | undefined;
   if (
     isRecord($.program, type) ||
     (!!type.baseModel &&
       isRecord($.program, type.baseModel) &&
       !isDeclaration($.program, type.baseModel))
   ) {
-    return zodMemberExpr(
+    console.log("Is record");
+    recordPart = zodMemberExpr(
       callPart(
         "record",
         <ZodSchema
@@ -182,41 +206,104 @@ function modelBaseType(type: Model) {
         />,
       ),
     );
-  } else {
-    console.log(type);
   }
 
-  const members =
-    type.properties.size > 0 ? (
+  let memberPart: Children | undefined;
+  if (type.properties.size > 0) {
+    const members = (
       <ObjectExpression>
         <For each={type.properties.values()} comma hardline enderPunctuation>
           {(prop) => (
-            <ObjectProperty name={prop.name}>
-              <ZodSchema type={prop} nested />
-            </ObjectProperty>
+            <ZodCustomTypeComponent
+              type={prop}
+              declare
+              Declaration={ObjectProperty}
+              declarationProps={{ name: prop.name }}
+            >
+              <ObjectProperty name={prop.name}>
+                <ZodSchema type={prop} nested />
+              </ObjectProperty>
+            </ZodCustomTypeComponent>
           )}
         </For>
       </ObjectExpression>
-    ) : (
-      <ObjectExpression />
     );
-  return zodMemberExpr(callPart("object", members));
+    memberPart = zodMemberExpr(callPart("object", members));
+  }
+
+  let parts: Children;
+
+  if (!memberPart && !recordPart) {
+    parts = zodMemberExpr(callPart("object", <ObjectExpression />));
+  } else if (memberPart && recordPart) {
+    parts = zodMemberExpr(callPart("intersection", memberPart, recordPart));
+  } else {
+    parts = memberPart ?? recordPart;
+  }
+
+  if (type.baseModel && shouldReference($.program, type.baseModel)) {
+    return (
+      <MemberExpression>
+        <MemberExpression.Part refkey={refkey(type.baseModel, refkeySym)} />
+        <MemberExpression.Part id="merge" />
+        <MemberExpression.Part args={[parts]} />
+      </MemberExpression>
+    );
+  }
+
+  return parts;
 }
 
 function unionBaseType(type: Union) {
-  // Only the base z.union([...])
   const { $ } = useTsp();
-  // Discriminated union detection is omitted for brevity; fallback to union
-  return zodMemberExpr(
-    callPart(
-      "union",
-      type.variants
-        ? Array.from(type.variants.values()).map((variant) => (
-            <ZodSchema type={variant.type} nested />
-          ))
-        : [],
-    ),
-  );
+
+  const discriminated = $.union.getDiscriminatedUnion(type);
+
+  if ($.union.isExpression(type) || !discriminated) {
+    return zodMemberExpr(
+      callPart(
+        "union",
+        <ArrayExpression>
+          <For each={type.variants} comma line>
+            {(name, variant) => {
+              return <ZodSchema type={variant.type} nested />;
+            }}
+          </For>
+        </ArrayExpression>,
+      ),
+    );
+  }
+
+  const propKey = discriminated.options.discriminatorPropertyName;
+  const envKey = discriminated.options.envelopePropertyName;
+  const unionArgs = [
+    `"${propKey}"`,
+    <ArrayExpression>
+      <For each={Array.from(type.variants.values())} comma line>
+        {(variant) => {
+          if (discriminated.options.envelope === "object") {
+            const envelope = $.model.create({
+              properties: {
+                [propKey]: $.modelProperty.create({
+                  name: propKey,
+                  type: $.literal.create(variant.name as string),
+                }),
+                [envKey]: $.modelProperty.create({
+                  name: envKey,
+                  type: variant.type,
+                }),
+              },
+            });
+            return <ZodSchema type={envelope} nested />;
+          } else {
+            return <ZodSchema type={variant.type} nested />;
+          }
+        }}
+      </For>
+    </ArrayExpression>,
+  ];
+
+  return zodMemberExpr(callPart("discriminatedUnion", ...unionArgs));
 }
 
 function intrinsicBaseType(type: Type) {

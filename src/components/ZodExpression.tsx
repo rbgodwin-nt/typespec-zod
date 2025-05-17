@@ -18,7 +18,7 @@ export interface ZodExpression {
 export function ZodExpression(props: ZodExpression) {
   return (
     <MemberExpression>
-      <>{zod.z}</>
+      <MemberExpression.Part refkey={zod.z} />
       {props.children}
     </MemberExpression>
   );
