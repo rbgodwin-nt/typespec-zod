@@ -469,7 +469,7 @@ describe("type customization signatures", () => {
             <>
               // a model declaration
               <hbr />
-              {props.default};
+              {props.default}
             </>
           );
         },
@@ -499,7 +499,6 @@ describe("type customization signatures", () => {
               <props.Declaration {...props.declarationProps}>
                 /* a declaration! */
               </props.Declaration>
-              ;
             </>
           );
         },
@@ -550,7 +549,7 @@ describe("type customization signatures", () => {
             .gte(12)
             .lte(2147483647)
             .describe("A scalar value is pretty neat!")
-            .nifty
+            .nifty;
         `,
       );
     });

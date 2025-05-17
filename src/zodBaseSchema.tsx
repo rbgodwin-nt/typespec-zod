@@ -192,7 +192,6 @@ function modelBaseType(type: Model) {
       isRecord($.program, type.baseModel) &&
       !isDeclaration($.program, type.baseModel))
   ) {
-    console.log("Is record");
     recordPart = zodMemberExpr(
       callPart(
         "record",
