@@ -1,7 +1,7 @@
 import { ModelProperty } from "@typespec/compiler";
 import { Typekit } from "@typespec/compiler/typekit";
 import { useTsp } from "@typespec/emitter-framework";
-import { TSValueExpression } from "./components/TSValueExpression.jsx";
+import { ValueExpression } from "@typespec/emitter-framework/typescript";
 import { callPart } from "./utils.jsx";
 
 export function zodMemberParts(member?: ModelProperty) {
@@ -15,7 +15,7 @@ function defaultParts($: Typekit, member?: ModelProperty) {
   }
 
   return [
-    callPart("default", [<TSValueExpression value={member.defaultValue} />]),
+    callPart("default", [<ValueExpression value={member.defaultValue} />]),
   ];
 }
 function optionalParts($: Typekit, member?: ModelProperty) {
