@@ -8,7 +8,7 @@ import {
 } from "@typespec/compiler";
 import { Typekit } from "@typespec/compiler/typekit";
 import { useTsp } from "@typespec/emitter-framework";
-import { callPart } from "./utils.jsx";
+import { callPart, shouldReference } from "./utils.jsx";
 
 export function zodConstraintsParts(type: Type, member?: ModelProperty) {
   const { $ } = useTsp();
@@ -144,13 +144,15 @@ function getDecoratorSources<T extends Type>(
     ...(member ? [member] : []),
     type,
   ];
+
   let currentType: Scalar | undefined = type.baseScalar;
-  while (currentType) {
+  while (currentType && !shouldReference($.program, currentType)) {
     sources.push(currentType);
     currentType = currentType.baseScalar;
   }
   return sources as (T | ModelProperty)[];
 }
+
 function numericConstraintsParts(
   $: Typekit,
   type: Scalar,

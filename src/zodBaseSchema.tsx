@@ -74,6 +74,12 @@ function literalBaseType($: Typekit, type: LiteralType) {
 }
 
 function scalarBaseType($: Typekit, type: Scalar) {
+  if (type.baseScalar && shouldReference($.program, type.baseScalar)) {
+    return (
+      <MemberExpression.Part refkey={refkey(type.baseScalar, refkeySym)} />
+    );
+  }
+
   if ($.scalar.extendsBoolean(type)) {
     return zodMemberExpr(callPart("boolean"));
   } else if ($.scalar.extendsNumeric(type)) {

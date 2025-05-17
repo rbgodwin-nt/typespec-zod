@@ -1,7 +1,7 @@
 import { For, render, StatementList } from "@alloy-js/core";
 import { d } from "@alloy-js/core/testing";
 import { MemberExpression, SourceFile } from "@alloy-js/typescript";
-import { Model, Program, Type } from "@typespec/compiler";
+import { Model, Program, Scalar, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { Output } from "@typespec/emitter-framework";
 import { describe, expect, test } from "vitest";
@@ -553,6 +553,50 @@ describe("type customization signatures", () => {
         `,
       );
     });
+
+    test("derived scalars", async () => {
+      const test = await testFor(
+        `
+          /**
+           * A scalar value is pretty neat!
+           */
+          @test @minValue(12) scalar Test extends int32;
+
+          /**
+           * A derived scalar
+           */
+          @test @maxValue(22) scalar Test2 extends Test;
+        `,
+        { types: true },
+      );
+      const options = ZodCustomEmitOptions().forType(test.types[0] as Scalar, {
+        declare(props) {
+          return (
+            <>
+              // a customized scalar declaration
+              <hbr />
+              {props.default}
+            </>
+          );
+        },
+      });
+
+      await expectOptionRender(
+        test,
+        options,
+        `
+          // a customized scalar declaration
+          const Test = z
+            .number()
+            .int()
+            .gte(12)
+            .lte(2147483647)
+            .describe("A scalar value is pretty neat!");
+          // a customized scalar declaration
+          const Test2 = Test.gte(-2147483648).lte(22).describe("A derived scalar");
+        `,
+      );
+    });
   });
 
   describe("customizing a reference", () => {
@@ -613,7 +657,6 @@ describe("type customization signatures", () => {
         `,
       );
     });
-
     test("assembling parts", async () => {
       const test = await testFor(
         `@test model Test {
