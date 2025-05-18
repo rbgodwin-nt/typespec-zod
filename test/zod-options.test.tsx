@@ -9,9 +9,10 @@ import { ZodOptions } from "../src/components/ZodOptions.jsx";
 import {
   zod,
   ZodCustomEmitOptions,
+  ZodSchema,
   ZodSchemaDeclaration,
 } from "../src/index.js";
-import { createTestRunner } from "./utils.jsx";
+import { createTestRunner, expectRender } from "./utils.jsx";
 interface GenericTestDescriptor {
   program: Program;
   types: Type[];
@@ -702,5 +703,67 @@ describe("type customization signatures", () => {
         `,
       );
     });
+  });
+});
+
+describe("end-to-end scenarios", () => {
+  test("enum to union", async () => {
+    const runner = await createTestRunner();
+    const { A, B, Test } = await runner.compile(`
+        enum MyEnum { a, b };
+        enum Color { red, green, blue };
+
+        @test
+        model A {
+          kind: MyEnum.a;
+          color: Color;
+        }
+
+        @test
+        model B {
+          kind: MyEnum.b;
+          color: Color;
+        }
+
+        @test
+        @discriminated(#{ envelope: "none" })
+        union Test {
+          a: A;
+          b: B;
+        }
+      `);
+    const emitOptions = ZodCustomEmitOptions().forTypeKind("Enum", {
+      reference(props) {
+        const union = $(runner.program).union.createFromEnum(props.type);
+        return <ZodSchema type={union} />;
+      },
+      noDeclaration: true,
+    });
+
+    const template = (
+      <ZodOptions customEmit={emitOptions}>
+        <StatementList>
+          <ZodSchemaDeclaration type={A} />
+          <ZodSchemaDeclaration type={B} />
+          <ZodSchemaDeclaration type={Test} />
+        </StatementList>
+      </ZodOptions>
+    );
+
+    expectRender(
+      runner.program,
+      template,
+      `
+        const A = z.object({
+          kind: z.literal("a"),
+          color: z.union([z.literal("red"), z.literal("green"), z.literal("blue")]),
+        });
+        const B = z.object({
+          kind: z.literal("b"),
+          color: z.union([z.literal("red"), z.literal("green"), z.literal("blue")]),
+        });
+        const Test = z.discriminatedUnion("kind", [A, B]);
+      `,
+    );
   });
 });

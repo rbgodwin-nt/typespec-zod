@@ -86,11 +86,11 @@ export class ZodCustomEmitOptionsClass {
   }
 }
 
-export interface ZodCustomEmitPropsBase {
+export interface ZodCustomEmitPropsBase<TCustomType extends Type> {
   /**
    * The TypeSpec type to render.
    */
-  type: Type;
+  type: TCustomType;
 
   /**
    * The default emitted output for this type.
@@ -128,7 +128,8 @@ export type CustomTypeToProps<TCustomType extends Type> =
           ? VarDeclarationProps
           : VarDeclarationProps | ObjectPropertyProps;
 
-export interface ZodCustomEmitReferenceProps extends ZodCustomEmitPropsBase {
+export interface ZodCustomEmitReferenceProps<TCustomType extends Type>
+  extends ZodCustomEmitPropsBase<TCustomType> {
   /**
    * The member this type is referenced from, if any. This member may contain
    * additional metadata that should be represented in the emitted output.
@@ -143,7 +144,7 @@ export interface ZodCustomEmitReferenceProps extends ZodCustomEmitPropsBase {
 }
 
 export interface ZodCustomEmitDeclareProps<TCustomType extends Type>
-  extends ZodCustomEmitPropsBase {
+  extends ZodCustomEmitPropsBase<TCustomType> {
   Declaration: ComponentDefinition<CustomTypeToProps<TCustomType>>;
   declarationProps: CustomTypeToProps<TCustomType>;
 }
@@ -151,12 +152,12 @@ export interface ZodCustomEmitDeclareProps<TCustomType extends Type>
 export type ZodCustomDeclarationComponent<TCustomType extends Type> =
   ComponentDefinition<ZodCustomEmitDeclareProps<TCustomType>>;
 
-export type ZodCustomReferenceComponent =
-  ComponentDefinition<ZodCustomEmitReferenceProps>;
+export type ZodCustomReferenceComponent<TCustomType extends Type> =
+  ComponentDefinition<ZodCustomEmitReferenceProps<TCustomType>>;
 
 export interface ZodCustomEmitOptionsBase<TCustomType extends Type> {
   declare?: ZodCustomDeclarationComponent<TCustomType>;
-  reference?: ZodCustomReferenceComponent;
+  reference?: ZodCustomReferenceComponent<TCustomType>;
   noDeclaration?: boolean;
 }
 
