@@ -753,7 +753,7 @@ describe("end-to-end scenarios", () => {
     expectRender(
       runner.program,
       template,
-      `
+      d`
         const A = z.object({
           kind: z.literal("a"),
           color: z.union([z.literal("red"), z.literal("green"), z.literal("blue")]),
