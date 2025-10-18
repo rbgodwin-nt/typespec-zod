@@ -11,11 +11,31 @@ import { $ } from "@typespec/compiler/typekit";
 import { Output, writeOutput } from "@typespec/emitter-framework";
 import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
-import { createCycleSets, shouldReference } from "./utils.jsx";
+import { createCycleSets, shouldReference, pascalZodNamePolicy, camelZodNamePolicy } from "./utils.jsx";
+
+/**
+ * Gets the appropriate naming policy based on the naming style option.
+ */
+function getNamingPolicy(namingStyle?: string) {
+  switch (namingStyle) {
+    case "pascal-case-schema":
+      return pascalZodNamePolicy;
+    case "camel-case":
+      return camelZodNamePolicy;
+    default:
+      return ts.createTSNamePolicy();
+  }
+}
 
 export async function $onEmit(context: EmitContext) {
   const types = createCycleSets(getAllDataTypes(context.program)).flat(1);
-  const tsNamePolicy = ts.createTSNamePolicy();
+  const outFileName = context.options.outFile ?? "models.ts";
+
+  console.log(`Emitter options: ${JSON.stringify(context.options)}`);
+
+  const tsNamePolicy = getNamingPolicy(context.options['naming-style']);
+
+  console.log(`Emitting ${types.length} types to ${outFileName}`);
 
   writeOutput(
     context.program,
@@ -24,7 +44,7 @@ export async function $onEmit(context: EmitContext) {
       namePolicy={tsNamePolicy}
       externals={[zod]}
     >
-      <ts.SourceFile path="models.ts">
+      <ts.SourceFile path={outFileName}>
         <ay.For
           each={types}
           ender={";"}
@@ -36,7 +56,7 @@ export async function $onEmit(context: EmitContext) {
             </>
           }
         >
-          {(type) => <ZodSchemaDeclaration type={type} export />}
+          {(type) => <ZodSchemaDeclaration type={type} export/>}
         </ay.For>
       </ts.SourceFile>
     </Output>,

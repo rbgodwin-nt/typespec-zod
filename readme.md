@@ -12,12 +12,12 @@ schemas within other emitter projects.
 
 ### TypeSpec Emitter
 
-1. `> tsp install typespec-zod`
-2. `> tsp compile . --emit typespec-zod`
+1. `> tsp install @pavones/typespec-zod`
+2. `> tsp compile . --emit @pavones/typespec-zod`
 
 ### Component Library
 
-1. `> npm install typespec-zod`
+1. `> npm install @pavones/typespec-zod`
 
 Note: requires peer dependencies for `@typespec/compiler`,
 `@typespec/emitter-framework`, `@alloy-js/core`, and `@alloy-js/typescript`.
@@ -88,7 +88,7 @@ export const pet = z.discriminatedUnion("kind", [
 import {
   zod, // symbol definitions for the Zod library
   ZodSchemaDeclaration, // component to declare a Zod schema
-} from "typespec-zod";
+} from "@pavones/typespec-zod";
 import { For, Output } from "@alloy-js/core";
 import { SourceFile } from "@alloy-js/typescript";
 import { writeOutput } from "@typespec/emitter-framework";

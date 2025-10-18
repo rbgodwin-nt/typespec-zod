@@ -63,6 +63,8 @@ export async function createEmitterTestRunner(
   emitterOptions?: {},
   includeHttp = false,
 ) {
+
+  console.log("createEmitterTestRunner: emitterOptions =", emitterOptions);
   const host = await createTestHost(includeHttp);
 
   const importAndUsings = includeHttp
@@ -72,9 +74,9 @@ export async function createEmitterTestRunner(
   return createTestWrapper(host, {
     wrapper: (code) => `${importAndUsings} ${code}`,
     compilerOptions: {
-      emit: ["typespec-zod"],
+      emit: ["@pavones/typespec-zod"],
       options: {
-        "typespec-zod": { ...emitterOptions },
+        "@pavones/typespec-zod": { ...emitterOptions },
       },
     },
   });
