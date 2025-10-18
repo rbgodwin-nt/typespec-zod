@@ -34,6 +34,7 @@ export async function $onEmit(context: EmitContext) {
   console.log(`Emitter options: ${JSON.stringify(context.options)}`);
 
   const tsNamePolicy = getNamingPolicy(context.options['naming-style']);
+  const emitZodInfer = context.options.emitZodInfer ?? false;
 
   console.log(`Emitting ${types.length} types to ${outFileName}`);
 
@@ -56,7 +57,7 @@ export async function $onEmit(context: EmitContext) {
             </>
           }
         >
-          {(type) => <ZodSchemaDeclaration type={type} export/>}
+          {(type) => <ZodSchemaDeclaration type={type} export emitZodInfer={emitZodInfer}/>}
         </ay.For>
       </ts.SourceFile>
     </Output>,

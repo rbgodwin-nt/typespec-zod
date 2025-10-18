@@ -8,6 +8,7 @@ interface ZodSchemaDeclarationProps
   extends Omit<ts.VarDeclarationProps, "type" | "name" | "value" | "kind">,
     ZodSchemaProps {
   readonly name?: string;
+  readonly emitZodInfer?: boolean;
 }
 
 /**
@@ -32,7 +33,7 @@ export function ZodSchemaDeclaration(props: ZodSchemaDeclarationProps) {
       props.type.kind,
   });
 
-  return (
+  const schemaDeclaration = (
     <ZodCustomTypeComponent
       declare
       type={props.type}
@@ -44,4 +45,27 @@ export function ZodSchemaDeclaration(props: ZodSchemaDeclarationProps) {
       </ts.VarDeclaration>
     </ZodCustomTypeComponent>
   );
+
+  // If emitZodInfer is enabled, also emit the type definition
+  if (props.emitZodInfer) {
+    // Get the original type name (before naming policy is applied)
+    const typeName = ("name" in props.type &&
+      typeof props.type.name === "string" &&
+      props.type.name) ||
+      props.type.kind;
+
+    return (
+      <>
+        {schemaDeclaration}
+        <ts.TypeDeclaration
+          name={typeName}
+          export
+        >
+          {`z.infer<typeof ${newProps.name}>`}
+        </ts.TypeDeclaration>
+      </>
+    );
+  }
+
+  return schemaDeclaration;
 }
