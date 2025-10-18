@@ -243,6 +243,9 @@ export function createZodNamePolicy(format: "pascal-case-schema" | "camel-case" 
         case "variable":
           console.log(`Creating name for ${name} as a ${element} with format ${format}`);
           return pascalCase(name)+'Schema';
+          case "type":
+            console.log(`Creating name for ${name} as a ${element} with format ${format}`);
+            return pascalCase(name);
         default:
           break
       }
