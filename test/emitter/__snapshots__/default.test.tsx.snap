@@ -88,8 +88,10 @@ export const PetSchema = z.discriminatedUnion(
     })
   ]
 );
+
 export type Pet = z.infer<typeof PetSchema>;
-"`;
+"
+`;
 
 exports[`emits all declarations 1`] = `
 "import { z } from "zod";

@@ -55,7 +55,7 @@ export async function $onEmit(context: EmitContext) {
               return (
                 <>
                   <ZodSchemaDeclaration type={type} export />;<hbr/><hbr/>
-                  <ZodInferTypeDeclaration type={type}  />
+                  <ZodInferTypeDeclaration type={type}  /> <hbr/>
                 </>
               );
             } else {
