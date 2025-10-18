@@ -172,7 +172,7 @@ it("emits Zod infer types when emitZodInfer is true", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it.only("emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema", async () => {
+it("emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema", async () => {
   const runner = await createEmitterTestRunner({ emitZodInfer: true, "naming-style": "pascal-case-schema" });
   await runner.compile(`
     model PetBase {

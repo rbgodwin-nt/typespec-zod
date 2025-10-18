@@ -50,8 +50,9 @@ export const pet = z.discriminatedUnion(
     })
   ]
 );
+
 export type Pet = z.infer<typeof pet>;
-"`;
+`;
 
 exports[`emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema 1`] = `
 "import { z } from "zod";
@@ -90,7 +91,6 @@ export const PetSchema = z.discriminatedUnion(
 );
 
 export type Pet = z.infer<typeof PetSchema>;
-"
 `;
 
 exports[`emits all declarations 1`] = `
@@ -181,6 +181,37 @@ export const PetSchema = z.discriminatedUnion(
     })
   ]
 );"
+`;
+
+exports[`handles the readme sample and emits camelCase when nameing-style is camel-case 1`] = `
+"import { z } from "zod";
+
+export const petBase = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(20),
+});
+
+export const dog = petBase.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export const cat = petBase.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+}));
+
+export const pet = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: dog,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: cat,
+    })
+  ]
+);
 `;
 
 exports[`handles the readme sample and emits camelCase when naming-style is camel-case 1`] = `

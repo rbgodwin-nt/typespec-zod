@@ -61,8 +61,9 @@ export async function $onEmit(context: EmitContext) {
             } else {
               return (
               <>
-               <ZodSchemaDeclaration type={type} export />;<hbr /><hbr />
-              </>);
+               <ZodSchemaDeclaration type={type} export />;<hbr/>
+              </>
+              );
             }
           }}
         </ay.For>
