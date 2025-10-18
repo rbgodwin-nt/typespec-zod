@@ -55,13 +55,13 @@ export async function $onEmit(context: EmitContext) {
               return (
                 <>
                   <ZodSchemaDeclaration type={type} export />;<hbr/><hbr/>
-                  <ZodInferTypeDeclaration type={type}  /> <hbr/>
+                  <ZodInferTypeDeclaration type={type} />
                 </>
               );
             } else {
               return (
               <>
-               <ZodSchemaDeclaration type={type} export />;<hbr/>
+               <ZodSchemaDeclaration type={type} export />; <hbr/>
               </>
               );
             }

@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { createEmitterTestRunner } from "../utils.jsx";
 
 
-it("emits all declarations", async () => {
+it.only("emits all declarations", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
     model MyModel {
@@ -27,7 +27,7 @@ it("emits all declarations", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it("handles references by doing a topological sort", async () => {
+it.only("handles references by doing a topological sort", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
     union MyUnion {
@@ -47,7 +47,7 @@ it("handles references by doing a topological sort", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it("handles the readme sample", async () => {
+it.only("handles the readme sample", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
 
@@ -78,7 +78,7 @@ it("handles the readme sample", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it("doesn't emit things from built-in libraries", async () => {
+it.only("doesn't emit things from built-in libraries", async () => {
   const runner = await createEmitterTestRunner({}, true);
   await runner.compile(`
     model PetBase {
@@ -99,7 +99,7 @@ it("doesn't emit things from built-in libraries", async () => {
 });
 
 
-it("handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema", async () => {
+it.only("handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema", async () => {
   const runner = await createEmitterTestRunner({ "naming-style": "pascal-case-schema" });
   
   await runner.compile(`
