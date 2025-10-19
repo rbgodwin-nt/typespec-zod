@@ -187,7 +187,7 @@ export const PetSchema = z.discriminatedUnion(
     })
   ]
 );
-
+"
 `;
 
 exports[`handles the readme sample and emits camelCase when naming-style is camel-case 1`] = `
@@ -218,5 +218,6 @@ export const pet = z.discriminatedUnion(
       value: cat,
     })
   ]
-);"
+);
+"
 `;

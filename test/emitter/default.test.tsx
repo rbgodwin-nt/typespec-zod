@@ -47,7 +47,7 @@ it("handles references by doing a topological sort", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it.only("handles the readme sample", async () => {
+it("handles the readme sample", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
 
@@ -148,7 +148,7 @@ it("handles the readme sample and emits camelCase when naming-style is camel-cas
   expect(text).toMatchSnapshot();
 });
 
-it.only("emits Zod infer types when emitZodInfer is true", async () => {
+it("emits Zod infer types when emitZodInfer is true", async () => {
   const runner = await createEmitterTestRunner({ "emit-zod-infer": true });
   await runner.compile(`
     model PetBase {
