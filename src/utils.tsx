@@ -1,11 +1,13 @@
-import { Refkey } from "@alloy-js/core";
-import { createNamePolicy, NamePolicy } from "@alloy-js/core";
-import { TypeScriptElements, } from "@alloy-js/typescript";
-import { camelCase, pascalCase } from "change-case";
+import { createNamePolicy, NamePolicy, Refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
-import { FunctionCallExpression, MemberExpression } from "@alloy-js/typescript";
+import {
+  FunctionCallExpression,
+  MemberExpression,
+  TypeScriptElements,
+} from "@alloy-js/typescript";
 import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { camelCase, pascalCase } from "change-case";
 import {
   getEmitOptionsForType,
   ZodOptionsContext,
@@ -235,17 +237,18 @@ export function callPart(target: string | Refkey, ...args: Children[]) {
   );
 }
 
-export function createZodNamePolicy(format: "pascal-case-schema" | "camel-case" | undefined): NamePolicy<TypeScriptElements> {
-
+export function createZodNamePolicy(
+  format: "pascal-case-schema" | "camel-case" | undefined,
+): NamePolicy<TypeScriptElements> {
   return createNamePolicy((name, element) => {
     if (format === "pascal-case-schema") {
       switch (element) {
         case "variable":
-          return pascalCase(name)+'Schema';
-          case "type":
-            return pascalCase(name);
+          return pascalCase(name) + "Schema";
+        case "type":
+          return pascalCase(name);
         default:
-          break
+          break;
       }
     }
     return camelCase(name);

@@ -9,10 +9,15 @@ import {
 } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
 import { Output, writeOutput } from "@typespec/emitter-framework";
-import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { ZodInferTypeDeclaration } from "./components/ZodInferTypeDeclaration.jsx";
+import { ZodSchemaDeclaration } from "./components/ZodSchemaDeclaration.jsx";
 import { zod } from "./external-packages/zod.js";
-import { createCycleSets, shouldReference, pascalZodNamePolicy, camelZodNamePolicy } from "./utils.jsx";
+import {
+  camelZodNamePolicy,
+  createCycleSets,
+  pascalZodNamePolicy,
+  shouldReference,
+} from "./utils.jsx";
 
 /**
  * Gets the appropriate naming policy based on the naming style option.
@@ -31,11 +36,11 @@ function getNamingPolicy(namingStyle?: string) {
 export async function $onEmit(context: EmitContext) {
   const types = createCycleSets(getAllDataTypes(context.program)).flat(1);
   const outFileName = context.options.outFile ?? "models.ts";
-  const emitInfer = context.options['emit-zod-infer'] ?? false;
+  const emitInfer = context.options["emit-zod-infer"] ?? false;
 
   console.log(`Emitter options: ${JSON.stringify(context.options)}`);
 
-  const tsNamePolicy = getNamingPolicy(context.options['naming-style']);
+  const tsNamePolicy = getNamingPolicy(context.options["naming-style"]);
 
   console.log(`Emitting ${types.length} types to ${outFileName}`);
 
@@ -47,14 +52,23 @@ export async function $onEmit(context: EmitContext) {
       externals={[zod]}
     >
       <ts.SourceFile path={outFileName}>
-        <ay.For
-          each={types}    
-        >
+        <ay.For each={types}>
           {(type) => {
             return (
               <>
-                <ZodSchemaDeclaration type={type} export /><>;<hbr /></>
-                {emitInfer && <><hbr /><ZodInferTypeDeclaration type={type} /><><hbr /></></>}
+                <ZodSchemaDeclaration type={type} export />
+                <>
+                  ;<hbr />
+                </>
+                {emitInfer && (
+                  <>
+                    <hbr />
+                    <ZodInferTypeDeclaration type={type} />
+                    <>
+                      <hbr />
+                    </>
+                  </>
+                )}
               </>
             );
           }}
@@ -64,7 +78,6 @@ export async function $onEmit(context: EmitContext) {
     context.emitterOutputDir,
   );
 }
-
 
 /**
  * Collects all the models defined in the spec
