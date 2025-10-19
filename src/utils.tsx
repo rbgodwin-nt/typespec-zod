@@ -1,15 +1,20 @@
-import { Refkey } from "@alloy-js/core";
+import { createNamePolicy, NamePolicy, Refkey } from "@alloy-js/core";
 import { Children } from "@alloy-js/core/jsx-runtime";
-import { FunctionCallExpression, MemberExpression } from "@alloy-js/typescript";
+import {
+  FunctionCallExpression,
+  MemberExpression,
+  TypeScriptElements,
+} from "@alloy-js/typescript";
 import { Program, Type } from "@typespec/compiler";
 import { $ } from "@typespec/compiler/typekit";
+import { camelCase, pascalCase } from "change-case";
 import {
   getEmitOptionsForType,
   ZodOptionsContext,
 } from "./context/zod-options.js";
 import { zod } from "./external-packages/zod.js";
 
-export const refkeySym = Symbol.for("typespec-zod.refkey");
+export const refkeySym = Symbol.for("@pavones/typespec-zod.refkey");
 
 /**
  * Returns true if the given type is a declaration or an instantiation of a
@@ -231,3 +236,24 @@ export function callPart(target: string | Refkey, ...args: Children[]) {
     </MemberExpression>
   );
 }
+
+export function createZodNamePolicy(
+  format: "pascal-case-schema" | "camel-case" | undefined,
+): NamePolicy<TypeScriptElements> {
+  return createNamePolicy((name, element) => {
+    if (format === "pascal-case-schema") {
+      switch (element) {
+        case "variable":
+          return pascalCase(name) + "Schema";
+        case "type":
+          return pascalCase(name);
+        default:
+          break;
+      }
+    }
+    return camelCase(name);
+  });
+}
+
+export const pascalZodNamePolicy = createZodNamePolicy("pascal-case-schema");
+export const camelZodNamePolicy = createZodNamePolicy("camel-case");

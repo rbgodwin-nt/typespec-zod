@@ -21,7 +21,9 @@ it("emits all declarations", async () => {
     }
   `);
 
-  const { text } = await runner.program.host.readFile("typespec-zod/models.ts");
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
 
   expect(text).toMatchSnapshot();
 });
@@ -41,7 +43,9 @@ it("handles references by doing a topological sort", async () => {
     }
   `);
 
-  const { text } = await runner.program.host.readFile("typespec-zod/models.ts");
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
 
   expect(text).toMatchSnapshot();
 });
@@ -72,7 +76,9 @@ it("handles the readme sample", async () => {
     }
   `);
 
-  const { text } = await runner.program.host.readFile("typespec-zod/models.ts");
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
 
   expect(text).toMatchSnapshot();
 });
@@ -92,7 +98,121 @@ it("doesn't emit things from built-in libraries", async () => {
     }
   `);
 
-  const { text } = await runner.program.host.readFile("typespec-zod/models.ts");
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
 
+  expect(text).toMatchSnapshot();
+});
+
+it("handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema", async () => {
+  const runner = await createEmitterTestRunner({
+    "naming-style": "pascal-case-schema",
+  });
+
+  await runner.compile(`
+    model PetBase {
+      age: uint8;
+      @maxLength(20)
+      name: string
+    }
+    model Dog extends PetBase {
+      walksPerDay: safeint;
+    }
+    model Cat extends PetBase {
+      belongingsShredded: uint64;
+    }
+    @discriminated
+    union Pet {
+      dog: Dog,
+      cat: Cat,
+    }
+  `);
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
+  expect(text).toMatchSnapshot();
+});
+
+it("handles the readme sample and emits camelCase when naming-style is camel-case", async () => {
+  const runner = await createEmitterTestRunner({
+    "naming-style": "camel-case",
+  });
+  await runner.compile(`
+    model PetBase {
+      age: uint8;
+      @maxLength(20)
+      name: string
+    }
+    model Dog extends PetBase {
+      walksPerDay: safeint;
+    }
+    model Cat extends PetBase {
+      belongingsShredded: uint64;
+    }
+    @discriminated
+    union Pet {
+      dog: Dog,
+      cat: Cat,
+    }
+  `);
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
+  expect(text).toMatchSnapshot();
+});
+
+it("emits Zod infer types when emitZodInfer is true", async () => {
+  const runner = await createEmitterTestRunner({ "emit-zod-infer": true });
+  await runner.compile(`
+    model PetBase {
+      age: uint8;
+      @maxLength(20)
+      name: string
+    }
+    model Dog extends PetBase {
+      walksPerDay: safeint;
+    }
+    model Cat extends PetBase {
+      belongingsShredded: uint64;
+    }
+    @discriminated
+    union Pet {
+      dog: Dog,
+      cat: Cat,
+    }
+  `);
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
+  expect(text).toMatchSnapshot();
+});
+
+it("emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema", async () => {
+  const runner = await createEmitterTestRunner({
+    "emit-zod-infer": true,
+    "naming-style": "pascal-case-schema",
+  });
+  await runner.compile(`
+    model PetBase {
+      age: uint8;
+      @maxLength(20)
+      name: string
+    }
+    model Dog extends PetBase {
+      walksPerDay: safeint;
+    }
+    model Cat extends PetBase {
+      belongingsShredded: uint64;
+    }
+    @discriminated
+    union Pet {
+      dog: Dog,
+      cat: Cat,
+    }
+  `);
+  const { text } = await runner.program.host.readFile(
+    "@pavones/typespec-zod/models.ts",
+  );
   expect(text).toMatchSnapshot();
 });

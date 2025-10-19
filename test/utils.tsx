@@ -72,9 +72,9 @@ export async function createEmitterTestRunner(
   return createTestWrapper(host, {
     wrapper: (code) => `${importAndUsings} ${code}`,
     compilerOptions: {
-      emit: ["typespec-zod"],
+      emit: ["@pavones/typespec-zod"],
       options: {
-        "typespec-zod": { ...emitterOptions },
+        "@pavones/typespec-zod": { ...emitterOptions },
       },
     },
   });

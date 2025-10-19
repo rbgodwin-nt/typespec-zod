@@ -12,7 +12,88 @@ export const refHttp = z.object({
   foo: z.object({
     statusCode: z.literal(200),
   }),
-});"
+});
+"
+`;
+
+exports[`emits Zod infer types when emitZodInfer is true 1`] = `
+"import { z } from "zod";
+
+export const petBase = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(20),
+});
+
+export type PetBase = z.infer<typeof petBase>;
+
+export const dog = petBase.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export type Dog = z.infer<typeof dog>;
+
+export const cat = petBase.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+}));
+
+export type Cat = z.infer<typeof cat>;
+
+export const pet = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: dog,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: cat,
+    })
+  ]
+);
+
+export type Pet = z.infer<typeof pet>;
+"
+`;
+
+exports[`emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema 1`] = `
+"import { z } from "zod";
+
+export const PetBaseSchema = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(20),
+});
+
+export type PetBase = z.infer<typeof PetBaseSchema>;
+
+export const DogSchema = PetBaseSchema.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export type Dog = z.infer<typeof DogSchema>;
+
+export const CatSchema = PetBaseSchema.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+}));
+
+export type Cat = z.infer<typeof CatSchema>;
+
+export const PetSchema = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: DogSchema,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: CatSchema,
+    })
+  ]
+);
+
+export type Pet = z.infer<typeof PetSchema>;
+"
 `;
 
 exports[`emits all declarations 1`] = `
@@ -28,7 +109,8 @@ export const myScalar = z.string();
 
 export const myFoo = z.union([z.literal(1), z.literal(2)]);
 
-export const myEnum = z.enum([1]);"
+export const myEnum = z.enum([1]);
+"
 `;
 
 exports[`handles references by doing a topological sort 1`] = `
@@ -40,7 +122,8 @@ export const myModel = z.object({
 
 export const myModelArray = z.array(myModel);
 
-export const myUnion = z.union([myModelArray, myModel]);"
+export const myUnion = z.union([myModelArray, myModel]);
+"
 `;
 
 exports[`handles the readme sample 1`] = `
@@ -71,5 +154,70 @@ export const pet = z.discriminatedUnion(
       value: cat,
     })
   ]
-);"
+);
+"
+`;
+
+exports[`handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema 1`] = `
+"import { z } from "zod";
+
+export const PetBaseSchema = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(20),
+});
+
+export const DogSchema = PetBaseSchema.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export const CatSchema = PetBaseSchema.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+}));
+
+export const PetSchema = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: DogSchema,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: CatSchema,
+    })
+  ]
+);
+"
+`;
+
+exports[`handles the readme sample and emits camelCase when naming-style is camel-case 1`] = `
+"import { z } from "zod";
+
+export const petBase = z.object({
+  age: z.number().int().nonnegative().lte(255),
+  name: z.string().max(20),
+});
+
+export const dog = petBase.merge(z.object({
+  walksPerDay: z.number().int().safe(),
+}));
+
+export const cat = petBase.merge(z.object({
+  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+}));
+
+export const pet = z.discriminatedUnion(
+  "kind",
+  [
+    z.object({
+      kind: z.literal("dog"),
+      value: dog,
+    }),
+    z.object({
+      kind: z.literal("cat"),
+      value: cat,
+    })
+  ]
+);
+"
 `;
