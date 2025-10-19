@@ -17,14 +17,9 @@ export function ZodInferTypeDeclaration(props: ZodInferTypeDeclarationProps) {
     props.type.name) ||
     props.type.kind;
 
-
   // Get the actual schema name with naming policy applied
   const namePolicy = useTSNamePolicy();
   const schemaName = namePolicy.getName(originalTypeName, "variable");
-
-  console.log(`ZodInferTypeDeclaration: OriginalTypeName: ${originalTypeName}`);
-  console.log(`ZodInferTypeDeclaration: SchemaName: ${schemaName}`);
-  console.log(`ZodInferTypeDeclaration: Type: ${props.type}`);
 
   return (
     <ts.TypeDeclaration

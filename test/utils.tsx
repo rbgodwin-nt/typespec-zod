@@ -64,7 +64,6 @@ export async function createEmitterTestRunner(
   includeHttp = false,
 ) {
 
-  console.log("createEmitterTestRunner: emitterOptions =", emitterOptions);
   const host = await createTestHost(includeHttp);
 
   const importAndUsings = includeHttp

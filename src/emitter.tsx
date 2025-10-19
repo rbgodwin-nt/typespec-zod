@@ -30,13 +30,13 @@ function getNamingPolicy(namingStyle?: string) {
 
 export async function $onEmit(context: EmitContext) {
   const types = createCycleSets(getAllDataTypes(context.program)).flat(1);
-  const outFileName = "models.ts";
+  const outFileName = context.options.outFile ?? "models.ts";
+  const emitInfer = context.options['emit-zod-infer'] ?? false;
 
   console.log(`Emitter options: ${JSON.stringify(context.options)}`);
 
   const tsNamePolicy = getNamingPolicy(context.options['naming-style']);
-  const emitZodInfer = context.options.emitZodInfer ?? false;
-  
+
   console.log(`Emitting ${types.length} types to ${outFileName}`);
 
   writeOutput(
@@ -48,23 +48,15 @@ export async function $onEmit(context: EmitContext) {
     >
       <ts.SourceFile path={outFileName}>
         <ay.For
-          each={types}
+          each={types}    
         >
           {(type) => {
-            if (emitZodInfer) {
-              return (
-                <>
-                  <ZodSchemaDeclaration type={type} export />;<hbr/><hbr/>
-                  <ZodInferTypeDeclaration type={type} />
-                </>
-              );
-            } else {
-              return (
+            return (
               <>
-               <ZodSchemaDeclaration type={type} export />; <hbr/>
+                <ZodSchemaDeclaration type={type} export /><>;<hbr /></>
+                {emitInfer && <><hbr /><ZodInferTypeDeclaration type={type} /><><hbr /></></>}
               </>
-              );
-            }
+            );
           }}
         </ay.For>
       </ts.SourceFile>
@@ -72,6 +64,7 @@ export async function $onEmit(context: EmitContext) {
     context.emitterOutputDir,
   );
 }
+
 
 /**
  * Collects all the models defined in the spec

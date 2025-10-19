@@ -53,6 +53,7 @@ export const pet = z.discriminatedUnion(
 );
 
 export type Pet = z.infer<typeof pet>;
+"
 `;
 
 exports[`emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema 1`] = `

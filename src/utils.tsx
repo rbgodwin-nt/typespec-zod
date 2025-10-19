@@ -241,16 +241,13 @@ export function createZodNamePolicy(format: "pascal-case-schema" | "camel-case" 
     if (format === "pascal-case-schema") {
       switch (element) {
         case "variable":
-          console.log(`Creating name for ${name} as a ${element} with format ${format}`);
           return pascalCase(name)+'Schema';
           case "type":
-            console.log(`Creating name for ${name} as a ${element} with format ${format}`);
             return pascalCase(name);
         default:
           break
       }
     }
-    console.log(`Creating name for ${name} as a ${element} with format camel-case`);
     return camelCase(name);
   });
 }

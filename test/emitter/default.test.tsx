@@ -2,7 +2,7 @@ import { expect, it } from "vitest";
 import { createEmitterTestRunner } from "../utils.jsx";
 
 
-it.only("emits all declarations", async () => {
+it("emits all declarations", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
     model MyModel {
@@ -27,7 +27,7 @@ it.only("emits all declarations", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it.only("handles references by doing a topological sort", async () => {
+it("handles references by doing a topological sort", async () => {
   const runner = await createEmitterTestRunner();
   await runner.compile(`
     union MyUnion {
@@ -78,7 +78,7 @@ it.only("handles the readme sample", async () => {
   expect(text).toMatchSnapshot();
 });
 
-it.only("doesn't emit things from built-in libraries", async () => {
+it("doesn't emit things from built-in libraries", async () => {
   const runner = await createEmitterTestRunner({}, true);
   await runner.compile(`
     model PetBase {
@@ -99,7 +99,7 @@ it.only("doesn't emit things from built-in libraries", async () => {
 });
 
 
-it.only("handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema", async () => {
+it("handles the readme sample and emits PascalCaseSchema when naming-style is pascal-case-schema", async () => {
   const runner = await createEmitterTestRunner({ "naming-style": "pascal-case-schema" });
   
   await runner.compile(`
@@ -124,7 +124,7 @@ it.only("handles the readme sample and emits PascalCaseSchema when naming-style 
   expect(text).toMatchSnapshot();
 });
 
-it("handles the readme sample and emits camelCase when nameing-style is camel-case", async () => {
+it("handles the readme sample and emits camelCase when naming-style is camel-case", async () => {
   const runner = await createEmitterTestRunner({ "naming-style": "camel-case" });
   await runner.compile(`
     model PetBase {
@@ -148,8 +148,8 @@ it("handles the readme sample and emits camelCase when nameing-style is camel-ca
   expect(text).toMatchSnapshot();
 });
 
-it("emits Zod infer types when emitZodInfer is true", async () => {
-  const runner = await createEmitterTestRunner({ emitZodInfer: true });
+it.only("emits Zod infer types when emitZodInfer is true", async () => {
+  const runner = await createEmitterTestRunner({ "emit-zod-infer": true });
   await runner.compile(`
     model PetBase {
       age: uint8;
@@ -173,7 +173,7 @@ it("emits Zod infer types when emitZodInfer is true", async () => {
 });
 
 it("emits Zod infer types when emitZodInfer is true and naming-style is pascal-case-schema", async () => {
-  const runner = await createEmitterTestRunner({ emitZodInfer: true, "naming-style": "pascal-case-schema" });
+  const runner = await createEmitterTestRunner({ "emit-zod-infer": true, "naming-style": "pascal-case-schema" });
   await runner.compile(`
     model PetBase {
       age: uint8;
