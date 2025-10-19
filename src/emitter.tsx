@@ -37,12 +37,7 @@ export async function $onEmit(context: EmitContext) {
   const types = createCycleSets(getAllDataTypes(context.program)).flat(1);
   const outFileName = context.options.outFile ?? "models.ts";
   const emitInfer = context.options["emit-zod-infer"] ?? false;
-
-  console.log(`Emitter options: ${JSON.stringify(context.options)}`);
-
   const tsNamePolicy = getNamingPolicy(context.options["naming-style"]);
-
-  console.log(`Emitting ${types.length} types to ${outFileName}`);
 
   writeOutput(
     context.program,
