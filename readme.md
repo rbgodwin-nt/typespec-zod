@@ -117,27 +117,28 @@ export const PetBaseSchema = z.object({
   name: z.string().max(20),
 });
 
-export const DogSchema = PetBaseSchema.merge(z.object({
-  walksPerDay: z.number().int().safe(),
-}));
-
-export const CatSchema = PetBaseSchema.merge(z.object({
-  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
-}));
-
-export const PetSchema = z.discriminatedUnion(
-  "kind",
-  [
-    z.object({
-      kind: z.literal("dog"),
-      value: DogSchema,
-    }),
-    z.object({
-      kind: z.literal("cat"),
-      value: CatSchema,
-    })
-  ]
+export const DogSchema = PetBaseSchema.merge(
+  z.object({
+    walksPerDay: z.number().int().safe(),
+  }),
 );
+
+export const CatSchema = PetBaseSchema.merge(
+  z.object({
+    belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+  }),
+);
+
+export const PetSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("dog"),
+    value: DogSchema,
+  }),
+  z.object({
+    kind: z.literal("cat"),
+    value: CatSchema,
+  }),
+]);
 ```
 
 ### Output with `naming-style: "camel-case"` (default)
@@ -150,27 +151,28 @@ export const petBase = z.object({
   name: z.string().max(20),
 });
 
-export const dog = petBase.merge(z.object({
-  walksPerDay: z.number().int().safe(),
-}));
-
-export const cat = petBase.merge(z.object({
-  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
-}));
-
-export const pet = z.discriminatedUnion(
-  "kind",
-  [
-    z.object({
-      kind: z.literal("dog"),
-      value: dog,
-    }),
-    z.object({
-      kind: z.literal("cat"),
-      value: cat,
-    })
-  ]
+export const dog = petBase.merge(
+  z.object({
+    walksPerDay: z.number().int().safe(),
+  }),
 );
+
+export const cat = petBase.merge(
+  z.object({
+    belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+  }),
+);
+
+export const pet = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("dog"),
+    value: dog,
+  }),
+  z.object({
+    kind: z.literal("cat"),
+    value: cat,
+  }),
+]);
 ```
 
 ### Output with `emit-zod-infer: true` and `naming-style: "pascal-case-schema"`
@@ -185,31 +187,32 @@ export const PetBaseSchema = z.object({
 
 export type PetBase = z.infer<typeof PetBaseSchema>;
 
-export const DogSchema = PetBaseSchema.merge(z.object({
-  walksPerDay: z.number().int().safe(),
-}));
+export const DogSchema = PetBaseSchema.merge(
+  z.object({
+    walksPerDay: z.number().int().safe(),
+  }),
+);
 
 export type Dog = z.infer<typeof DogSchema>;
 
-export const CatSchema = PetBaseSchema.merge(z.object({
-  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
-}));
+export const CatSchema = PetBaseSchema.merge(
+  z.object({
+    belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+  }),
+);
 
 export type Cat = z.infer<typeof CatSchema>;
 
-export const PetSchema = z.discriminatedUnion(
-  "kind",
-  [
-    z.object({
-      kind: z.literal("dog"),
-      value: DogSchema,
-    }),
-    z.object({
-      kind: z.literal("cat"),
-      value: CatSchema,
-    })
-  ]
-);
+export const PetSchema = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("dog"),
+    value: DogSchema,
+  }),
+  z.object({
+    kind: z.literal("cat"),
+    value: CatSchema,
+  }),
+]);
 
 export type Pet = z.infer<typeof PetSchema>;
 ```
@@ -226,31 +229,32 @@ export const petBase = z.object({
 
 export type PetBase = z.infer<typeof petBase>;
 
-export const dog = petBase.merge(z.object({
-  walksPerDay: z.number().int().safe(),
-}));
+export const dog = petBase.merge(
+  z.object({
+    walksPerDay: z.number().int().safe(),
+  }),
+);
 
 export type Dog = z.infer<typeof dog>;
 
-export const cat = petBase.merge(z.object({
-  belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
-}));
+export const cat = petBase.merge(
+  z.object({
+    belongingsShredded: z.bigint().nonnegative().lte(18446744073709551615n),
+  }),
+);
 
 export type Cat = z.infer<typeof cat>;
 
-export const pet = z.discriminatedUnion(
-  "kind",
-  [
-    z.object({
-      kind: z.literal("dog"),
-      value: dog,
-    }),
-    z.object({
-      kind: z.literal("cat"),
-      value: cat,
-    })
-  ]
-);
+export const pet = z.discriminatedUnion("kind", [
+  z.object({
+    kind: z.literal("dog"),
+    value: dog,
+  }),
+  z.object({
+    kind: z.literal("cat"),
+    value: cat,
+  }),
+]);
 
 export type Pet = z.infer<typeof pet>;
 ```
