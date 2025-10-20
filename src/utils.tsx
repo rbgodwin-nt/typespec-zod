@@ -245,7 +245,6 @@ export function createZodNamePolicy(
     suffixCharacters: "$_",
   };
   return createNamePolicy((name, element) => {
-    console.log(`Name: ${name} Element: ${element}`);
     if (format === "pascal-case-schema") {
       switch (element) {
         case "variable":
