@@ -240,18 +240,27 @@ export function callPart(target: string | Refkey, ...args: Children[]) {
 export function createZodNamePolicy(
   format: "pascal-case-schema" | "camel-case" | undefined,
 ): NamePolicy<TypeScriptElements> {
+  const caseOptions = {
+    prefixCharacters: "$_",
+    suffixCharacters: "$_",
+  };
   return createNamePolicy((name, element) => {
+    console.log(`Name: ${name} Element: ${element}`);
     if (format === "pascal-case-schema") {
       switch (element) {
         case "variable":
-          return pascalCase(name) + "Schema";
+          return pascalCase(name, caseOptions) + "Schema";
+        case "class":
         case "type":
-          return pascalCase(name);
+        case "interface":
+        case "enum":
+        case "enum-member":
+          return pascalCase(name, caseOptions);
         default:
           break;
       }
     }
-    return camelCase(name);
+    return camelCase(name, caseOptions);
   });
 }
 
